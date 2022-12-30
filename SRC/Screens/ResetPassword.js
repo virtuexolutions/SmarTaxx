@@ -1,34 +1,29 @@
 import React, {useState} from 'react';
 import {
-  View,
-  Image,
-  TouchableOpacity,
   Dimensions,
-  Keyboard,
   ImageBackground,
-  ScrollView,
   ToastAndroid,
   Alert,
   ActivityIndicator,
 } from 'react-native';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch, useSelector} from 'react-redux';
 import TextInputWithTitle from '../Components/TextInputWithTitle';
 import Color from '../Assets/Utilities/Color';
 import CustomText from '../Components/CustomText';
 import {apiHeader, windowHeight, windowWidth} from '../Utillity/utils';
-import ScreenBoiler from '../Components/ScreenBoiler';
 import CustomButton from '../Components/CustomButton';
 import {setIsVerified, setUserLogin, setUserToken} from '../Store/slices/auth';
-import CustomImage from '../Components/CustomImage';
 import {Platform} from 'react-native';
 import {setUserData} from '../Store/slices/common';
 import {Post} from '../Axios/AxiosInterceptorFunction';
+import CardContainer from '../Components/CardContainer';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import CustomStatusBar from '../Components/CustomStatusBar';
+import CustomHeader from '../Components/CustomHeader';
+import navigationService from '../navigationService';
 
 
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
 
 
 const ResetPassword = props => {
@@ -85,158 +80,165 @@ const ResetPassword = props => {
   // dispatch(setUserToken('123456'));
 
   return (
-    <ScreenBoiler
-      showHeader={false}
-      showBack={false}
-      showDrawer={false}
-      statusBarBackgroundColor={Color.green}
-      statusBarContentStyle={'light-content'}
-    >
-      <View
+    <>
+    <CustomStatusBar backgroundColor={'white'} barStyle={'dark-content'} />
+    <ImageBackground
+      style={{
+        flex: 1,
+        width: windowWidth,
+        height: windowHeight,
+      }}
+      resizeMode={'stretch'}
+      source={require('../Assets/Images/imageBackground.png')}>
+      <CustomHeader
         style={{
-          // borderWidth: 4,
-          // borderColor: Color.themeColor1,
-          alignItems: 'center',
-          height: windowHeight,
-          width: windowWidth,
-          paddingVertical: moderateScale(30, 0.3),
-          backgroundColor: Color.white,
+          marginTop: moderateScale(20, 0.3),
         }}
-      >
-        <CustomImage
-          style={styles.img}
-          resizeMode={'contain'}
-          source={require('../Assets/Images/splash.png')}
-        />
+        text={'Reset Password'}
+        leftIcon
+      />
 
-        <CustomText style={styles.Txt}>
-          {'Set your new \n'}
-          <CustomText
-            isBold
-            style={{
-              // lineHeight: moderateScale(50, 0.3),
-              fontSize: moderateScale(40, 0.3),
-              color: Color.themeBlack,
-              fontWeight: 'bold',
-            }}
-          >
-            password
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: moderateScale(20, 0.3),
+          alignItems: 'center',
+          justifyContent : 'center',
+          width: '100%',
+          height : windowHeight * 0.8,
+      
+        }}>
+     
+        <CardContainer style={{paddingVertical: moderateScale(30, 0.3)}}>
+          <CustomText style={styles.txt2}>Reset Your Password</CustomText>
+          <CustomText style={styles.txt3}>
+            Enter your new password
           </CustomText>
-        </CustomText>
-        <View style={{marginTop: moderateScale(50, 0.3)}}>
           <TextInputWithTitle
-            iconName="lock"
-            iconType={FontAwesome5}
-            titleText={'New Password'}
+            // iconName="lock"
+            // iconType={FontAwesome}
+            titleText={'password'}
             secureText={true}
-            placeholder={'New Password'}
+            placeholder={'password'}
             setText={setPassword}
             value={password}
             viewHeight={0.06}
-            viewWidth={0.9}
-            inputWidth={0.8}
+            viewWidth={0.75}
+            inputWidth={0.7}
             border={1}
-            borderColor={Color.themeLightGray}
-            backgroundColor={'#F5F5F5'}
-            marginTop={moderateScale(30, 0.3)}
-            color={Color.themeLightGray}
+            borderColor={'#1B5CFB45'}
+            backgroundColor={'#FFFFFF'}
+            marginTop={moderateScale(15, 0.3)}
+            color={Color.themeColor}
             placeholderColor={Color.themeLightGray}
+            borderRadius={moderateScale(25, 0.3)}
+            marginBottom={moderateScale(10,0.3)}
+            elevation
           />
-          <TextInputWithTitle
-            iconName="lock"
-            iconType={FontAwesome5}
-            titleText={'Confirm Password'}
+            <TextInputWithTitle
+            // iconName="lock"
+            // iconType={FontAwesome}
+            titleText={'Re-type password'}
             secureText={true}
-            placeholder={'Confirm Password'}
+            placeholder={'Re-type password'}
             setText={setConfirmPassword}
             value={confirmPassword}
             viewHeight={0.06}
-            viewWidth={0.9}
-            inputWidth={0.8}
-            // marginTop={0.04}
+            viewWidth={0.75}
+            inputWidth={0.7}
             border={1}
-            borderColor={Color.themeLightGray}
-            backgroundColor={'#F5F5F5'}
-            marginTop={moderateScale(20, 0.3)}
-            color={Color.themeLightGray}
+            borderColor={'#1B5CFB45'}
+            backgroundColor={'#FFFFFF'}
+            marginTop={moderateScale(15, 0.3)}
+            color={Color.themeColor}
             placeholderColor={Color.themeLightGray}
+            borderRadius={moderateScale(25, 0.3)}
+            marginBottom={moderateScale(10,0.3)}
+            elevation
           />
-        </View>
-        <CustomButton
-          // textTransform={"capitalize"}
-          text={
-            isLoading ? (
-              <ActivityIndicator color={'#000'} size={'small'} />
-            ) : (
-              'Submit'
-            )
-          }
-          isBold
-          textColor={Color.white}
-          width={windowWidth * 0.75}
-          height={windowHeight * 0.06}
-          marginTop={moderateScale(40, 0.3)}
-          onPress={passwordReset}
-          bgColor={Color.green}
-          borderColor={Color.white}
-          borderWidth={2}
-          borderRadius={moderateScale(30, 0.3)}
-        />
-      </View>
-    </ScreenBoiler>
+        </CardContainer>
+          <CustomButton
+            // textTransform={"capitalize"}
+            text={
+              isLoading ? (
+                <ActivityIndicator color={'#ffffff'} size={'small'} />
+              ) : (
+                'Verify now'
+              )
+            }
+            isBold
+            textColor={Color.white}
+            width={windowWidth * 0.8}
+            height={windowHeight * 0.06}
+            marginTop={moderateScale(20, 0.3)}
+            onPress={()=>{navigationService.navigate('InternalAuditor')}}
+            bgColor={Color.themeColor}
+            borderColor={Color.white}
+            borderWidth={2}
+            borderRadius={moderateScale(30, 0.3)}
+          />
+      </KeyboardAwareScrollView>
+    </ImageBackground>
+  </>
   );
 };
 
 const styles = ScaledSheet.create({
-  sectionContainer: {
-    // flex: 1,
-    height: windowHeight,
-    paddingTop: moderateScale(5, 0.3),
-  },
-  Txt: {
-    marginTop: moderateScale(10, 0.3),
-    color: Color.themeBlack,
-    fontSize: moderateScale(22, 0.6),
-    textAlign: 'center',
-  },
-  tou: {
-    marginTop: height * 0.03,
-    width: width * 0.9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  img: {height: windowHeight * 0.16},
-  Tou: {
-    width: width * 0.9,
-    height: height * 0.055,
-    marginTop: height * 0.03,
-  },
   txt2: {
-    color: 'white',
-    fontSize: moderateScale(16, 0.6),
+    color: Color.themeColor,
+    fontSize: moderateScale(25, 0.6),
+    fontWeight: 'bold',
   },
   txt3: {
-    color: '#FFFFFF',
-    fontSize: moderateScale(14, 0.6),
+    color: Color.themeLightGray,
+    fontSize: moderateScale(13, 0.6),
+    textAlign: 'center',
+    width: '70%',
+    marginTop: moderateScale(20, 0.3),
+    // lineHeight: moderateScale(20, 0.3),
   },
   txt4: {
-    color: '#FFFFFF',
+    color: Color.themePink,
     fontSize: moderateScale(14, 0.6),
     borderBottomWidth: 1,
     borderColor: Color.white,
+    // alignSelf : 'center'
   },
   txt5: {
-    color: '#FFFFFF',
+    color: Color.black,
 
-    fontSize: moderateScale(14, 0.6),
+    fontSize: moderateScale(12, 0.6),
   },
-  container2: {
-    flexDirection: 'row',
-    alignItems: 'center',
+
+  
+  codeFieldRoot: {
+    marginTop: moderateScale(20, 0.3),
+    marginBottom: moderateScale(15, 0.3),
+    width: windowWidth * 0.7,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  cellRoot: {
+    width: moderateScale(50, 0.3),
+    height: 50,
     justifyContent: 'center',
-    width: width * 0.9,
-    marginTop: height * 0.01,
+    alignItems: 'center',
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 2,
+    // backgroundColor: Color.black,
+    // borderRadius: moderateScale(10, 0.3),
+  },
+  focusCell: {
+    // backgroundColor: Color.themeColor,
+    // borderRadius: moderateScale(10, 0.3),
+
+    borderBottomColor: Color.themeDarkGray,
+    borderBottomWidth: 2,
+  },
+  cellText: {
+    color: Color.themeColor,
+    fontSize: moderateScale(36, 0.3),
+    textAlign: 'center',
   },
 });
 

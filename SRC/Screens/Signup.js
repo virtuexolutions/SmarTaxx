@@ -1,14 +1,18 @@
 import {
+  ActivityIndicator,
+  Alert,
   ImageBackground,
+  Platform,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useState} from 'react';
 import ScreenBoiler from '../Components/ScreenBoiler';
 import CustomStatusBar from '../Components/CustomStatusBar';
-import {windowHeight, windowWidth} from '../Utillity/utils';
+import {apiHeader, windowHeight, windowWidth} from '../Utillity/utils';
 import CustomHeader from '../Components/CustomHeader';
 import CardContainer from '../Components/CardContainer';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
@@ -24,8 +28,15 @@ import {Icon} from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomText from '../Components/CustomText';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { validateEmail } from '../Config';
+import { Post } from '../Axios/AxiosInterceptorFunction';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../Store/slices/common';
+import { setUserToken } from '../Store/slices/auth';
 
 const Signup = () => {
+  const dispatch = useDispatch()
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [designation, setDesignation] = useState('');
@@ -37,6 +48,72 @@ const Signup = () => {
   const [showModal, setShowModal] = useState(false);
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
+
+  const formData = new FormData();
+
+
+  const SignUp = async () => {
+   
+    const params = {
+     
+      role : userRole ,
+      first_name: `${firstName}`,
+      last_name: `${lastName}`,
+      designation : designation,
+      email: email,
+      phone: contact,
+      password: password,
+      c_password: confirmPassword,
+    };
+    
+    for (let key in params) {
+      if (params[key] === '') {
+        return Platform.OS == 'android'
+          ? ToastAndroid.show(` ${key} field is empty`, ToastAndroid.SHORT)
+          : Alert.alert(` ${key} field is empty`);
+      }
+      formData.append(key , params[key]);
+    }
+    formData.append('image',image)
+    console.log(JSON.stringify(formData,null,2))
+    if (isNaN(contact)) {
+      return Platform.OS == 'android'
+        ? ToastAndroid.show('phone is not a number', ToastAndroid.SHORT)
+        : Alert.alert('phone is not a number');
+    }
+    if (!validateEmail(email)) {
+      return Platform.OS == 'android'
+        ? ToastAndroid.show('email is not validate', ToastAndroid.SHORT)
+        : Alert.alert('email is not validate');
+    }
+    if (password.length < 8) {
+      return Platform.OS == 'android'
+        ? ToastAndroid.show(
+            'Password should atleast 8 character long',
+            ToastAndroid.SHORT,
+          )
+        : Alert.alert('Password should atleast 8 character long');
+    }
+    if (password != confirmPassword) {
+      return Platform.OS == 'android'
+        ? ToastAndroid.show('Password does not match', ToastAndroid.SHORT)
+        : Alert.alert('Password does not match');
+    }
+
+    const url = 'register';
+    setIsLoading(true);
+    const response = await Post(url, formData, apiHeader());
+    setIsLoading(false);
+    if (response != undefined) {
+      console.log("response?.data", response?.data?.data);
+      Platform.OS === 'android'
+        ? ToastAndroid.show('User Registered Succesfully', ToastAndroid.SHORT)
+        : Alert.alert("User Registered Succesfully");
+        dispatch(setUserData(response?.data?.data?.user_info));
+        dispatch(setUserToken(response?.data?.data));
+      
+    }
+  };
 
   return (
     <>
@@ -253,7 +330,7 @@ const Signup = () => {
               height={windowHeight * 0.06}
               marginTop={moderateScale(20, 0.3)}
               onPress={() => {
-                navigationService.navigate('Thankyou');
+                SignUp()
               }}
               bgColor={Color.themeColor}
               borderRadius={moderateScale(30, 0.3)}
@@ -287,8 +364,8 @@ const styles = ScaledSheet.create({
     // width: windowWidth * 0.8,
     // height: windowHeight * 0.5,
     marginTop: moderateScale(10, 0.3),
-    maxHeight: windowHeight * 0.7,
-    overflow: 'visible',
+    // maxHeight: windowHeight * 0.7,
+    overflow: 'hidden',
     // backgroundColor : 'green'
   },
   userTypeContainer: {

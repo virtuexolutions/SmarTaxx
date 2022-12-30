@@ -129,7 +129,7 @@ const LoginScreen = () => {
           />
           <CustomText
             onPress={() => {
-              // navigationService.navigate('EnterPhone', {fromForgot: true});
+              navigationService.navigate('EnterPhone', {fromForgot: true});
             }}
             style={styles.txt3}
           >

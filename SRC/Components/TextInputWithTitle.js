@@ -187,7 +187,7 @@ elevation: 9,
           numberOfLines={props.numberOfLines || 1}
           editable={props.disable ? false : true}
           autoCapitalize='none'
-          onPressIn={()=>{console.log('fdadsas');}}
+          // onPressIn={()=>{console.log('fdadsas');}}
           // textAlignVertical={props.textAlignVertical}
         />
       )}

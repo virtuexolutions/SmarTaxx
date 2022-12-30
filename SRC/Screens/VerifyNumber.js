@@ -1,14 +1,11 @@
 import React, {useState} from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   Dimensions,
-  Keyboard,
   ImageBackground,
   Platform,
   ToastAndroid,
-  Alert,
 } from 'react-native';
 import {ScaledSheet, moderateScale} from 'react-native-size-matters';
 
@@ -20,14 +17,9 @@ import Color from '../Assets/Utilities/Color';
 import CustomText from '../Components/CustomText';
 
 import {apiHeader, windowHeight, windowWidth} from '../Utillity/utils';
-import ScreenBoiler from '../Components/ScreenBoiler';
 import CustomButton from '../Components/CustomButton';
-import {setIsVerified, setUserToken} from '../Store/slices/auth';
-import {validateEmail} from '../Config';
 import {ActivityIndicator} from 'react-native';
 import {Post} from '../Axios/AxiosInterceptorFunction';
-import {setUserData} from '../Store/slices/common';
-import {Icon, ScrollView} from 'native-base';
 import {
   CodeField,
   Cursor,
@@ -35,9 +27,11 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import {useEffect} from 'react';
+import CardContainer from '../Components/CardContainer';
+import CustomStatusBar from '../Components/CustomStatusBar';
+import CustomHeader from '../Components/CustomHeader';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
 
 const VerifyNumber = props => {
   const dispatch = useDispatch();
@@ -47,7 +41,7 @@ const VerifyNumber = props => {
   const fromForgot = props?.route?.params?.fromForgot;
   const phoneNumber = props?.route?.params?.phoneNumber;
 
-    // console.log(phoneNumber)
+
 
   //states
   const [code, setCode] = useState('');
@@ -70,189 +64,157 @@ const VerifyNumber = props => {
     time == 0 && (settimerLabel('Resend Code '), settime(''));
   };
 
-  const sendOTP = async()=>{
-    const url = "password/email"
+  const sendOTP = async () => {
+    const url = 'password/email';
     setIsLoading(true);
-    const response = await Post(url ,{email : 'syedbaber115@gmail.com'} , apiHeader());
+    const response = await Post(
+      url,
+      {email: 'syedbaber115@gmail.com'},
+      apiHeader(),
+    );
     setIsLoading(false);
-    if(response != undefined){
-      Platform.OS == 'android' ?
-      ToastAndroid.show(`OTP sent to syedbaber115@gmail.com` , ToastAndroid.SHORT) :
-      alert(`OTP sent to syedbaber115@gmail.com`)
+    if (response != undefined) {
+      Platform.OS == 'android'
+        ? ToastAndroid.show(
+            `OTP sent to syedbaber115@gmail.com`,
+            ToastAndroid.SHORT,
+          )
+        : alert(`OTP sent to syedbaber115@gmail.com`);
     }
-  }
+  };
 
-  const VerifyOTP = async()=>{
-    const url = "verify";
+  const VerifyOTP = async () => {
+    const url = 'verify';
     setIsLoading(true);
     console.log(code);
-    const response = await Post(url ,{email_code : code} , apiHeader());
+    const response = await Post(url, {email_code: code}, apiHeader());
     setIsLoading(false);
-    if(response != undefined){
-      Platform.OS == 'android' ?
-      ToastAndroid.show(`otp verified` , ToastAndroid.SHORT) :
-      alert(`otp verified`)
+    if (response != undefined) {
+      Platform.OS == 'android'
+        ? ToastAndroid.show(`otp verified`, ToastAndroid.SHORT)
+        : alert(`otp verified`);
 
-      navigationService.navigate('ResetPassword',{phoneNumber : phoneNumber})
+      navigationService.navigate('ResetPassword', {phoneNumber: phoneNumber});
     }
-    
-  }
+  };
 
   useEffect(() => {
     label();
   }, [time]);
-  
+
   // useEffect(()=>{
   //   if(timerLabel == )
   //   sendOTP();
   // },[timerLabel])
 
   return (
-    <ScreenBoiler
-      statusBarBackgroundColor={Color.green}
-      statusBarContentStyle={'light-content'}
-    >
-      <View style={styles.sectionContainer}>
-        <Image
-          source={require('../Assets/Images/verify.png')}
-          //   resizeMode={'contain'}
+    <>
+      <CustomStatusBar backgroundColor={'white'} barStyle={'dark-content'} />
+      <ImageBackground
+        style={{
+          flex: 1,
+          width: windowWidth,
+          height: windowHeight,
+        }}
+        resizeMode={'stretch'}
+        source={require('../Assets/Images/imageBackground.png')}>
+        <CustomHeader
           style={{
-            alignSelf: 'center',
-            // backgroundColor : 'red',
-            height: windowHeight * 0.35,
-            marginTop: moderateScale(10, 0.3),
+            marginTop: moderateScale(20, 0.3),
           }}
+          text={'Enter OTP'}
+          leftIcon
         />
-        <View style={styles.subcontainer}>
-          <CustomText style={styles.txt2}>Verify Account</CustomText>
-          <CustomText style={styles.txt3}>
-            Enter four digit code we have sent to{' '}
-            {<CustomText style={{color: Color.black}}>{phoneNumber}</CustomText>}
-          </CustomText>
-          <CodeField
-            placeholder={'0'}
-            ref={ref}
-            value={code}
-            onChangeText={setCode}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFieldRoot}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            renderCell={({index, symbol, isFocused}) => (
-              <View
-                onLayout={getCellOnLayoutHandler(index)}
-                key={index}
-                style={[styles.cellRoot, isFocused && styles.focusCell]}
-              >
-                <CustomText
-                  style={[styles.cellText, isFocused && {color: Color.black}]}
-                >
-                  {symbol || (isFocused ? <Cursor /> : null)}
+
+        <KeyboardAwareScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: moderateScale(20, 0.3),
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: windowHeight * 0.8,
+          }}>
+          <CardContainer style={{paddingVertical: moderateScale(30, 0.3)}}>
+            <CustomText style={styles.txt2}>Verify Account</CustomText>
+            <CustomText style={styles.txt3}>
+              Enter four digit code we have sent to{' '}
+              {
+                <CustomText style={{color: Color.black}}>
+                  {phoneNumber}
                 </CustomText>
-              </View>
-            )}
-          />
-          <CustomText style={styles.txt3}>
-            Haven't Recieved Verification Code ?{' '}
-            {
-              <TouchableOpacity
-                disabled={timerLabel == 'Resend Code ' ? false : true}
-                onPress={() => {
-                  sendOTP(),
-                  settimerLabel('ReSend in '), settime(120);
-                }}
-              >
-                <CustomText style={[styles.txt4]}>
-                  {timerLabel} {time}
-                </CustomText>
-              </TouchableOpacity>
-            }
-          </CustomText>
+              }
+            </CustomText>
+            <CodeField
+              placeholder={'0'}
+              ref={ref}
+              value={code}
+              onChangeText={setCode}
+              cellCount={CELL_COUNT}
+              rootStyle={styles.codeFieldRoot}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              renderCell={({index, symbol, isFocused}) => (
+                <View
+                  onLayout={getCellOnLayoutHandler(index)}
+                  key={index}
+                  style={[styles.cellRoot, isFocused && styles.focusCell]}>
+                  <CustomText
+                    style={[
+                      styles.cellText,
+                      isFocused && {color: Color.black},
+                    ]}>
+                    {symbol || (isFocused ? <Cursor /> : null)}
+                  </CustomText>
+                </View>
+              )}
+            />
+            <CustomText style={styles.txt3}>
+              Haven't Recieved Verification Code ?{' '}
+              {
+                <TouchableOpacity
+                  disabled={timerLabel == 'Resend Code ' ? false : true}
+                  onPress={() => {
+                    sendOTP(), settimerLabel('ReSend in '), settime(120);
+                  }}>
+                  <CustomText style={[styles.txt4]}>
+                    {timerLabel} {time}
+                  </CustomText>
+                </TouchableOpacity>
+              }
+            </CustomText>
+          </CardContainer>
           <CustomButton
             // textTransform={"capitalize"}
             text={
               isLoading ? (
-                <ActivityIndicator color={'#000'} size={'small'} />
+                <ActivityIndicator color={'#ffffff'} size={'small'} />
               ) : (
                 'Verify now'
               )
             }
             isBold
             textColor={Color.white}
-            width={windowWidth * 0.75}
+            width={windowWidth * 0.8}
             height={windowHeight * 0.06}
-            marginTop={moderateScale(40, 0.3)}
-            onPress={VerifyOTP}
-            bgColor={Color.green}
+            marginTop={moderateScale(20, 0.3)}
+            onPress={() => {
+              navigationService.navigate('ResetPassword',{phoneNumber : phoneNumber});
+            }}
+            bgColor={Color.themeColor}
             borderColor={Color.white}
             borderWidth={2}
             borderRadius={moderateScale(30, 0.3)}
           />
-        </View>
-      </View>
-    </ScreenBoiler>
+        </KeyboardAwareScrollView>
+      </ImageBackground>
+    </>
   );
 };
 
 const styles = ScaledSheet.create({
-  sectionContainer: {
-    // flex: 1,
-    height: windowHeight,
-    paddingTop: moderateScale(5, 0.3),
-  },
-  Txt: {
-    marginTop: moderateScale(10, 0.3),
-    color: Color.themeBlack,
-    fontSize: moderateScale(22, 0.6),
-    textAlign: 'center',
-  },
-  tou: {
-    marginTop: height * 0.03,
-    width: width * 0.9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconContainer: {
-    width: windowWidth * 0.75,
-    // backgroundColor : 'red',
-    paddingVertical: moderateScale(5, 0.3),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: moderateScale(15, 0.3),
-    marginTop: moderateScale(10, 0.3),
-  },
-  cont: {
-    height: windowHeight * 0.05,
-    width: windowWidth * 0.3,
-    borderRadius: moderateScale(20, 0.3),
-    opacity: 0.6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  imageContainer: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
-    backgroundColor: Color.white,
-    borderRadius: moderateScale(30, 0.3),
-    paddingHorizontal: moderateScale(25, 0.3),
-    paddingVertical: moderateScale(15, 0.3),
-    marginVertical: moderateScale(40, 0.3),
-  },
-  img: {height: windowHeight * 0.26},
-  Tou: {
-    width: width * 0.9,
-    height: height * 0.055,
-    marginTop: height * 0.03,
-  },
   txt2: {
-    color: Color.green,
+    color: Color.themeColor,
     fontSize: moderateScale(25, 0.6),
     fontWeight: 'bold',
   },
@@ -260,15 +222,16 @@ const styles = ScaledSheet.create({
     color: Color.themeLightGray,
     fontSize: moderateScale(13, 0.6),
     textAlign: 'center',
-    width: '60%',
+    width: '70%',
     marginTop: moderateScale(20, 0.3),
-    lineHeight: moderateScale(20, 0.3),
+    // lineHeight: moderateScale(20, 0.3),
   },
   txt4: {
-    color: Color.green,
+    color: Color.themePink,
     fontSize: moderateScale(14, 0.6),
     borderBottomWidth: 1,
     borderColor: Color.white,
+    // alignSelf : 'center'
   },
   txt5: {
     color: Color.black,
@@ -276,26 +239,6 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(12, 0.6),
   },
 
-  subcontainer: {
-    position: 'absolute',
-    bottom: 0,
-    width: windowWidth,
-    height: windowHeight * 0.6,
-    backgroundColor: Color.white,
-    alignItems: 'center',
-    paddingTop: moderateScale(40, 0.3),
-    borderTopLeftRadius: moderateScale(45, 0.3),
-    borderTopRightRadius: moderateScale(45, 0.3),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
-
-    elevation: 24,
-  },
   codeFieldRoot: {
     marginTop: moderateScale(20, 0.3),
     marginBottom: moderateScale(15, 0.3),
@@ -321,7 +264,7 @@ const styles = ScaledSheet.create({
     borderBottomWidth: 2,
   },
   cellText: {
-    color: Color.green,
+    color: Color.themeColor,
     fontSize: moderateScale(36, 0.3),
     textAlign: 'center',
   },

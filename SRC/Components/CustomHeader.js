@@ -11,13 +11,13 @@ import navigationService from '../navigationService';
 import { useNavigation } from '@react-navigation/native';
 
 
-const CustomHeader = ({leftIcon, RightIcon, text }) => {
+const CustomHeader = ({leftIcon, RightIcon, text , style }) => {
 
   const navigation = useNavigation();
 
  
   return (
-    <View style={styles.header}>
+    <View style={[styles.header,style && style]}>
         {leftIcon &&
         <Icon
         name='left'
@@ -74,10 +74,11 @@ const styles = StyleSheet.create({
     shadowRadius: 11.14,
     
     elevation: 17,
+    alignSelf : 'center'
   },
   text : {
     color: Color.themeColor,
-    fontSize : moderateScale(13,0.6),
+    fontSize : moderateScale(15,0.6),
     alignSelf : 'center',
     fontWeight : 'bold',
   },

@@ -10,38 +10,39 @@ import InternalAuditor from './Screens/InternalAuditor';
 import Options from './Screens/Options';
 import InnerScreen from './Screens/InnerScreen';
 import Signup from './Screens/Signup';
+import EnterPhone from './Screens/EnterPhone';
+import VerifyNumber from './Screens/VerifyNumber';
+import ResetPassword from './Screens/ResetPassword';
 
 const AppNavigator = () => {
   // const isLogin = false;
-  const isGoalCreated = useSelector(state => state.authReducer.isGoalCreated);
-
   const walkThrough = useSelector(state => state.authReducer.userWalkThrough);
-  const isVerified = useSelector(state => state.authReducer.isVerified);
   const token = useSelector(state => state.authReducer.token);
- 
+  const user = useSelector(state => state.commonReducer.userData);
   console.log(
-    '🚀 ~ file: appNavigation.js ~ line 32 ~ AppNavigator ~ walkThrough',
-    token != null && isGoalCreated == true,
-    isGoalCreated,
+    '🚀 ~ file: appNavigation.js:22 ~ AppNavigator ~ user',
+    user?.role,
   );
+
+  
 
   const RootNav = createNativeStackNavigator();
   const RootNavLogged = createNativeStackNavigator();
 
   const AppNavigatorContainer = () => {
-    const firstScreen =
-        !token ?
-        'LoginScreen'
-        :
-        'HomeScreen'
-        ;
+    const firstScreen = !token
+      ? 'LoginScreen'
+      : token && user?.role == 'Receptionist'
+      ? 'Receptionist'
+      : token && user?.role == 'Internal Auditor'
+      ? 'InternalAuditor'
+      : 'LoginScreen';
 
     return (
       <NavigationContainer ref={navigationService.navigationRef}>
         <RootNav.Navigator
           initialRouteName={firstScreen}
           screenOptions={{headerShown: false}}>
-      
           <RootNav.Screen name="LoginScreen" component={LoginScreen} />
           <RootNav.Screen name="Receptionist" component={Receptionist} />
           <RootNav.Screen name="Thankyou" component={Thankyou} />
@@ -49,13 +50,9 @@ const AppNavigator = () => {
           <RootNav.Screen name="Options" component={Options} />
           <RootNav.Screen name="InnerScreen" component={InnerScreen} />
           <RootNav.Screen name="Signup" component={Signup} />
-
-
-
-       
-
-
-      
+          <RootNav.Screen name="EnterPhone" component={EnterPhone} />
+          <RootNav.Screen name="VerifyNumber" component={VerifyNumber} />
+          <RootNav.Screen name="ResetPassword" component={ResetPassword} />
         </RootNav.Navigator>
       </NavigationContainer>
     );
