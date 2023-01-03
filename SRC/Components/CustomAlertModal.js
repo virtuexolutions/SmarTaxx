@@ -64,7 +64,7 @@ const CustomAlertModal = (props) => {
           }}
         >
           <CustomButton
-            bgColor={Color.green}
+            bgColor={Color.themePink}
             borderColor={'white'}
             borderWidth={1}
             textColor={Color.white}
@@ -86,9 +86,9 @@ const CustomAlertModal = (props) => {
             >
               <CustomButton
                 bgColor={Color.white}
-                borderColor={Color.green}
+                borderColor={Color.themePink}
                 borderWidth={1}
-                textColor={Color.green}
+                textColor={Color.themePink}
                 onPress={onClose}
                 width={width * 0.3}
                 height={height * 0.055}
@@ -111,7 +111,7 @@ const CustomAlertModal = (props) => {
 
 const styles = ScaledSheet.create({
   modalUpperView: {
-    backgroundColor: Color.green,
+    backgroundColor: Color.themeColor,
     width: width * 0.8,
     minHeight: height * 0.14,
     maxHeight: height * 0.18,

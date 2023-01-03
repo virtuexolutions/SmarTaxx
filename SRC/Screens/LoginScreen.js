@@ -1,44 +1,93 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {ActivityIndicator, ImageBackground, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  ImageBackground,
+  Platform,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Color from '../Assets/Utilities/Color';
 import CustomStatusBar from '../Components/CustomStatusBar';
 import CustomText from '../Components/CustomText';
 import CustomImage from '../Components/CustomImage';
-import {windowHeight, windowWidth} from '../Utillity/utils';
+import {apiHeader, windowHeight, windowWidth} from '../Utillity/utils';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import ScreenBoiler from '../Components/ScreenBoiler';
 import CustomModal from '../Components/CustomModal';
 import LinearGradient from 'react-native-linear-gradient';
 import TextInputWithTitle from '../Components/TextInputWithTitle';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../Components/CustomButton';
-import { ScrollView } from 'native-base';
+import {ScrollView} from 'native-base';
 import navigationService from '../navigationService';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
+import {Post} from '../Axios/AxiosInterceptorFunction';
+import {validateEmail} from '../Config';
+import {setUserData} from '../Store/slices/common';
+import {setUserLogin} from '../Store/slices/auth';
+import {useDispatch} from 'react-redux';
 
 const LoginScreen = () => {
+  const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [visible, setVisible] = useState(true);
-  console.log("🚀 ~ file: LoginScreen.js:21 ~ LoginScreen ~ visible", visible)
   const [firstSection, setFirstSection] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [email , setEmail] = useState('');
-  const [password , setPassword]=useState('')
-  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const Splash1 = require('../Assets/Images/AccesoriesBig.png');
   const Splash2 = require('../Assets/Images/AccesoriesRight.png');
   const Splash3 = require('../Assets/Images/AccesoriesSmall.png');
 
-  useEffect(() => {
-    setVisible(true)
-
-    return()=>{
-      setVisible(false)
+  const handleLogin = async loginFor => {
+    console.log(
+      '🚀 ~ file: LoginScreen.js:38 ~ handleLogin ~ loginFor',
+      loginFor,
+    );
+    const url = 'login';
+    const body = {
+      email: email.trim(),
+      password: password,
+    };
+    if (email == '' || password == '') {
+      return Platform.OS == 'android'
+        ? ToastAndroid.show('Required Field is empty', ToastAndroid.SHORT)
+        : alert('Required Field is empty');
     }
-  }, [isFocused])
-  
+    if (!validateEmail(email)) {
+      return Platform.OS == 'android'
+        ? ToastAndroid.show('Please use valid email', ToastAndroid.SHORT)
+        : alert('Please use valid email');
+    }
+    setIsLoading(true);
+    const response = await Post(url, body, apiHeader());
+    setIsLoading(false);
+    if (response != undefined) {
+      console.log(response?.data);
+      // console.log('yes' ,  response?.data?.data?.user_info?.role , loginFor)
+      response?.data?.data?.user_info?.role == loginFor
+        ? (dispatch(setUserData(response?.data?.data?.user_info)),
+          dispatch(setUserLogin(response?.data?.data?.token)))
+        : Platform.OS == 'android'
+        ? ToastAndroid.show(
+            'This User is not registered for selected role',
+            ToastAndroid.SHORT,
+          )
+        : alert('This User is not registered for selected role');
+    }
+  };
+
+  useEffect(() => {
+    setVisible(true);
+
+    return () => {
+      setVisible(false);
+    };
+  }, [isFocused]);
 
   return (
     <ScreenBoiler
@@ -67,23 +116,23 @@ const LoginScreen = () => {
           />
         </View>
       </View>
-      <CustomModal >
+      <CustomModal>
         <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          alignSelf: 'center',
-          alignItems : 'center'
-        }}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            alignSelf: 'center',
+            alignItems: 'center',
+          }}
           style={{
             width: '100%',
-            flexGrow : 0,
+            flexGrow: 0,
             // minHeight : windowHeight * 0.6,
             // backgroundColor : 'red',
           }}>
           <Text style={styles.Heading}>FINANCE</Text>
           <Text style={styles.subHeading}>Welcome Back</Text>
           <Text style={styles.text}>
-          Please use your username and password For Login
+            Please use your username and password For Login
           </Text>
           <TextInputWithTitle
             iconName="user-o"
@@ -124,20 +173,18 @@ const LoginScreen = () => {
             color={Color.themeColor}
             placeholderColor={Color.themeLightGray}
             borderRadius={moderateScale(25, 0.3)}
-            marginBottom={moderateScale(10,0.3)}
+            marginBottom={moderateScale(10, 0.3)}
             elevation
           />
           <CustomText
             onPress={() => {
               navigationService.navigate('EnterPhone', {fromForgot: true});
             }}
-            style={styles.txt3}
-          >
+            style={styles.txt3}>
             {'Forgot Password?'}
           </CustomText>
-          
+
           <CustomButton
-       
             text={
               isLoading ? (
                 <ActivityIndicator color={'#FFFFFF'} size={'small'} />
@@ -149,49 +196,44 @@ const LoginScreen = () => {
             width={windowWidth * 0.68}
             height={windowHeight * 0.06}
             marginTop={moderateScale(20, 0.3)}
-            onPress={()=>{navigationService.navigate('Receptionist')}}
+            onPress={() => {
+              handleLogin('Receptionist');
+            }}
             bgColor={Color.themeColor}
             // borderColor={Color.white}
             // borderWidth={2}
             borderRadius={moderateScale(30, 0.3)}
-            
           />
-            <CustomButton
-       
-       text={
-         isLoading ? (
-           <ActivityIndicator color={'#FFFFFF'} size={'small'} />
-         ) : (
-           'Login With Internal Auditor'
-         )
-       }
-       textColor={Color.white}
-       width={windowWidth * 0.68}
-       height={windowHeight * 0.06}
-       marginTop={moderateScale(20, 0.3)}
-       onPress={()=>{navigationService.navigate('InternalAuditor')}}
-       bgColor={Color.themeColor}
-     
-       borderRadius={moderateScale(30, 0.3)}
-     />
-        <View style={styles.container2}>
+          <CustomButton
+            text={
+              isLoading ? (
+                <ActivityIndicator color={'#FFFFFF'} size={'small'} />
+              ) : (
+                'Login With Internal Auditor'
+              )
+            }
+            textColor={Color.white}
+            width={windowWidth * 0.68}
+            height={windowHeight * 0.06}
+            marginTop={moderateScale(20, 0.3)}
+            onPress={() => {
+              handleLogin('Internal Auditor');
+            }}
+            bgColor={Color.themeColor}
+            borderRadius={moderateScale(30, 0.3)}
+          />
+          <View style={styles.container2}>
             <CustomText style={styles.txt5}>
               {"Don't have an account? "}
             </CustomText>
 
             <TouchableOpacity
-            activeOpacity={0.8}
-            style={{marginLeft: windowWidth * 0.01}}
-              onPress={() => navigationService.navigate('Signup')}
-            >
+              activeOpacity={0.8}
+              style={{marginLeft: windowWidth * 0.01}}
+              onPress={() => navigationService.navigate('Signup')}>
               <CustomText style={styles.txt4}>{'Sign Up'}</CustomText>
             </TouchableOpacity>
           </View>
-
-
-    
-
-
         </ScrollView>
       </CustomModal>
     </ScreenBoiler>
@@ -215,7 +257,7 @@ const styles = ScaledSheet.create({
     alignSelf: 'center',
     fontWeight: '500',
     textAlign: 'center',
-    marginTop : moderateScale(10,0.3)
+    marginTop: moderateScale(10, 0.3),
   },
   bottomImage1: {
     width: windowWidth * 0.25,
@@ -251,8 +293,8 @@ const styles = ScaledSheet.create({
     textAlign: 'center',
     lineHeight: moderateScale(20, 0.3),
     // marginTop: moderateScale(10, 0.3),
-    width : '60%',
-    alignSelf : 'center'
+    width: '60%',
+    alignSelf: 'center',
   },
   emptyBar: {
     width: windowWidth * 0.6,
@@ -268,7 +310,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(10, 0.6),
     alignSelf: 'flex-end',
     marginRight: moderateScale(40, 0.3),
-    fontWeight : '600'
+    fontWeight: '600',
   },
   container2: {
     flexDirection: 'row',

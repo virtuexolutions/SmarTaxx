@@ -149,7 +149,7 @@ const SplashScreen = () => {
             Hi, Welcome !!
           </Text>
           <Text style={styles.text}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing
+          Exceeding Your Expectations Every day .
           </Text>
          <View style={styles.emptyBar}>
           <LinearGradient

@@ -3,12 +3,14 @@ import {
   ActivityIndicator,
   FlatList,
   ImageBackground,
+  Platform,
   Text,
+  ToastAndroid,
   View,
 } from 'react-native';
 import Color from '../Assets/Utilities/Color';
 import CustomStatusBar from '../Components/CustomStatusBar';
-import {windowHeight, windowWidth} from '../Utillity/utils';
+import {apiHeader, windowHeight, windowWidth} from '../Utillity/utils';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../Components/CustomButton';
@@ -17,10 +19,17 @@ import CustomHeader from '../Components/CustomHeader';
 import Bottomtab from '../Components/Bottomtab';
 import TextInputWithTitle from '../Components/TextInputWithTitle';
 import CardContainer from '../Components/CardContainer';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { Post } from '../Axios/AxiosInterceptorFunction';
+import { useSelector } from 'react-redux';
+import navigationService from '../navigationService';
 
 const InnerScreen = props => {
+  const token = useSelector((state)=>state.authReducer.token);
   const name = props?.route?.params?.name;
+  console.log("🚀 ~ file: InnerScreen.js:29 ~ InnerScreen ~ name", name)
+  const id = props?.route?.params?._id ;
+
 
   //states for TaxPayer
   const [SSN, setSSN] = useState('');
@@ -69,10 +78,10 @@ const InnerScreen = props => {
   const [completeName, setCompleteName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
 
-//   const [arrayForFlatList, setArrayForFlatList] = useState([]);
-//   console.log("🚀 ~ file: InnerScreen.js:72 ~ InnerScreen ~ arrayForFlatList", arrayForFlatList)
-  const [isLoading ,setIsLoading] = useState(false)
-  const [scannedImage,setScannedImage] = useState([]);
+  //   const [arrayForFlatList, setArrayForFlatList] = useState([]);
+  //   console.log("🚀 ~ file: InnerScreen.js:72 ~ InnerScreen ~ arrayForFlatList", arrayForFlatList)
+  const [isLoading, setIsLoading] = useState(false);
+  const [scannedImage, setScannedImage] = useState([]);
 
   const Due_Diligence = [
     {
@@ -246,34 +255,144 @@ const InnerScreen = props => {
     },
   ];
 
-//   useEffect(() => {
-//     name == 'Taxpayer or spouse'
-//       ? setArrayForFlatList(TaxPayer)
-//       : name == 'Due Diligence verification'
-//       ? setArrayForFlatList(Due_Diligence)
-//       : name == 'Refund Dispersement'
-//       ? setArrayForFlatList(Refund_Dispersement)
-//       : name == 'Payment Method'
-//       ? setArrayForFlatList(Payment_Method)
-//       : name == 'Status of Internal Audit'
-//       ? setArrayForFlatList(internal_audit)
-//       : name == 'IRS Status'
-//       ? setArrayForFlatList(IRS_status)
-//       : name == 'Refund/ Invoice'
-//       ? setArrayForFlatList(Refund_Invoice)
-//       : setArrayForFlatList(Referral);
+  const InnerScreenHandleSubmit = async () => {
+    const body =
+      name == 'Taxpayer or spouse'
+        ? {
+            receptionist_id: id,
+            spouse_information: SSN,
+            address: address,
+            dependent: dependant,
+            tax_document: documents,
+            paystub: payStub,
+            w2: w2,
+            nec: NEC,
+            morgage: morgage,
+          }
+        : name == 'Due Diligence verification'
+        ? {
+            receptionist_id: id,
+            eitc: EITC,
+            ctc: CTC,
+            actc: ACTC,
+            aotc: AOTC,
+            irs_notes: irsNotes,
+            signature: Signatures,
+          }
+        : name == 'Refund Dispersement'
+        ? {
+            receptionist_id: id,
+            product: product,
+            check: check,
+            direct_deposit: directDeposit,
+            green_card: greenDot,
+            account_no: routing,
+          }
+        : name == 'Payment Method'
+        ? {
+            receptionist_id: id,
+            out_of_pocket: outOfPocket,
+            deduct_from_refund: deductFromRefund,
+          }
+        : name == 'Status of Internal Audit'
+        ? {
+            receptionist_id: id,
+            failed: failed,
+            intentional_failed: internationalFailed,
+            passed: passed,
+          }
+        : name == 'IRS Status'
+        ? {
+            receptionist_id: id,
+            accepted: accepted,
+            rejected: rejected,
+          }
+        : name == 'Refund/ Invoice'
+        ? {
+            receptionist_id: id,
+            federal_amount: federal,
+            state_amount: state,
+            preparation_fee: fee,
+          }
+        : {
+            receptionist_id: id,
+            name: completeName,
+            phone: phoneNumber,
+          };
 
-//     return () => {
-//       setArrayForFlatList([]);
-//     };
-//   }, []);
+    const urlTax = 'taxpayer';
+    const urlDue = 'diligence_verification';
+    const urlRefund = 'refund_dispersements';
+    const urlPaymentMethod = 'payment_methods';
+    const urlinternal = 'internal_audits';
+    const urlIRS = 'irs_status';
+    const urlRefund_invoice = 'refund_invoices';
+    const urlRefferal = 'refferals';
+    // console.log(body);
+
+    for (let key in body) {
+      if (['', null, undefined].includes(body[key])) {
+        return Platform.OS == 'android'
+          ? ToastAndroid.show('All fields are required', ToastAndroid.SHORT)
+          : alert('All fields are required');
+      }
+    }
+    const url_for_Api =
+      name == 'Taxpayer or spouse'
+        ? urlTax
+        : name == 'Due Diligence verification'
+        ? urlDue
+        : name == 'Refund Dispersement'
+        ? urlRefund
+        : name == 'Payment Method'
+        ? urlPaymentMethod
+        : name == 'Status of Internal Audit'
+        ? urlinternal
+        : name == 'IRS Status'
+        ? urlIRS 
+        : name == 'Refund/ Invoice'
+        ? urlRefund_invoice
+        : urlRefferal
+
+      console.log("🚀 ~ file: InnerScreen.js:339 ~ InnerScreenHandleSubmit ~ url_for_Api", url_for_Api , body)
+
+      setIsLoading(true);
+      const response = await Post(url_for_Api , body , apiHeader(token))
+      setIsLoading(false);
+
+        if(response != undefined){
+          navigationService.navigate('Options',{item : response?.data?.data})
+          console.log(response?.data?.data);
+        }
+
+
+  };
+
+  //   useEffect(() => {
+  //     name == 'Taxpayer or spouse'
+  //       ? setArrayForFlatList(TaxPayer)
+  //       : name == 'Due Diligence verification'
+  //       ? setArrayForFlatList(Due_Diligence)
+  //       : name == 'Refund Dispersement'
+  //       ? setArrayForFlatList(Refund_Dispersement)
+  //       : name == 'Payment Method'
+  //       ? setArrayForFlatList(Payment_Method)
+  //       : name == 'Status of Internal Audit'
+  //       ? setArrayForFlatList(internal_audit)
+  //       : name == 'IRS Status'
+  //       ? setArrayForFlatList(IRS_status)
+  //       : name == 'Refund/ Invoice'
+  //       ? setArrayForFlatList(Refund_Invoice)
+  //       : setArrayForFlatList(Referral);
+
+  //     return () => {
+  //       setArrayForFlatList([]);
+  //     };
+  //   }, []);
 
   return (
     <>
-      <CustomStatusBar
-         backgroundColor={'white'}
-        barStyle={'dark-content'}
-      />
+      <CustomStatusBar backgroundColor={'white'} barStyle={'dark-content'} />
       <ImageBackground
         style={{
           flex: 1,
@@ -283,42 +402,37 @@ const InnerScreen = props => {
         }}
         resizeMode={'stretch'}
         source={require('../Assets/Images/imageBackground.png')}>
-       <KeyboardAwareScrollView
-      //  nestedScrollEnabled={true}
-       showsVerticalScrollIndicator={false}
-      
-       contentContainerStyle={{
-        alignItems : 'center',
-        // backgroundColor : 'red'
-       }}
-       >
-
-        <CustomHeader
-          leftIcon
-          // RightIcon
-          text={name}
-        />
-        <CardContainer style={styles.cardContainer}>
-        
+        <KeyboardAwareScrollView
+          //  nestedScrollEnabled={true}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            alignItems: 'center',
+            // backgroundColor : 'red'
+          }}>
+          <CustomHeader
+            leftIcon
+            // RightIcon
+            text={name}
+          />
+          <CardContainer style={styles.cardContainer}>
             <FlatList
-            nestedScrollEnabled={true}
+              nestedScrollEnabled={true}
               data={
                 name == 'Taxpayer or spouse'
-                ? TaxPayer
-                : name == 'Due Diligence verification'
-                ? Due_Diligence
-                : name == 'Refund Dispersement'
-                ? Refund_Dispersement
-                : name == 'Payment Method'
-                ? Payment_Method
-                : name == 'Status of Internal Audit'
-                ? internal_audit
-                : name == 'IRS Status'
-                ? IRS_status
-                : name == 'Refund/ Invoice'
-                ? Refund_Invoice
-                : Referral
-
+                  ? TaxPayer
+                  : name == 'Due Diligence verification'
+                  ? Due_Diligence
+                  : name == 'Refund Dispersement'
+                  ? Refund_Dispersement
+                  : name == 'Payment Method'
+                  ? Payment_Method
+                  : name == 'Status of Internal Audit'
+                  ? internal_audit
+                  : name == 'IRS Status'
+                  ? IRS_status
+                  : name == 'Refund/ Invoice'
+                  ? Refund_Invoice
+                  : Referral
               }
               showsVerticalScrollIndicator={false}
               style={{
@@ -352,9 +466,9 @@ const InnerScreen = props => {
                   />
                 );
               }}
-              ListFooterComponent={()=>{
-                return(
-                    <CustomButton
+              ListFooterComponent={() => {
+                return (
+                  <CustomButton
                     text={
                       isLoading ? (
                         <ActivityIndicator color={'#FFFFFF'} size={'small'} />
@@ -366,26 +480,19 @@ const InnerScreen = props => {
                     width={windowWidth * 0.4}
                     height={windowHeight * 0.06}
                     marginTop={moderateScale(20, 0.3)}
-                    onPress={() => {
-                    //   navigationService.navigate('Thankyou');
-                    alert('Action to be performed')
-                    }}
+                    onPress={InnerScreenHandleSubmit}
                     bgColor={Color.themeColor}
                     borderRadius={moderateScale(30, 0.3)}
                   />
-                )
+                );
               }}
             />
-          
-        
-        </CardContainer>
-
+          </CardContainer>
         </KeyboardAwareScrollView>
-        <Bottomtab 
-        scannedImage={scannedImage}
-        setScannedImage={setScannedImage}
+        <Bottomtab
+          scannedImage={scannedImage}
+          setScannedImage={setScannedImage}
         />
-
       </ImageBackground>
     </>
   );
@@ -394,7 +501,7 @@ const InnerScreen = props => {
 const styles = ScaledSheet.create({
   cardContainer: {
     marginTop: moderateScale(20, 0.3),
-    marginBottom : moderateScale(20,0.3)
+    marginBottom: moderateScale(20, 0.3),
     // height : windowHeight * 0.7,
   },
 });

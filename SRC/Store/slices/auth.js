@@ -17,21 +17,14 @@ const AuthSlice = createSlice({
       state.token = action?.payload?.token;
       console.log('TOKEN', state.token);
     },
-    setGoalCreated(state,action){
-      console.log('here ==== >',action?.payload);
-      state.isGoalCreated = action?.payload
-    },
+    
     SetFCMToken(state, action) {
       state.fcmToken = action?.payload?.fcmToken;
     },
     setUserLogin(state, action) {
       state.token = action?.payload;
     },
-    setIsVerified(state, action) {
-      state.isVerified = action?.payload;
-      console.log('isVerified', state.isVerified);
-    },
-    setUserLogout(state, action) {
+    setUserLogoutAuth(state, action) {
       state.token = null;
       state.fcmToken = null;
     },
@@ -42,13 +35,14 @@ const AuthSlice = createSlice({
 });
 
 export const {
-  setIsVerified,
+  
   setUserLogin,
-  setUserLogout,
+  setUserLogoutAuth,
   setUserToken,
   SetFCMToken,
   setWalkThrough,
-  setGoalCreated,
+  
+  
 } = AuthSlice.actions;
 
 export default AuthSlice.reducer;

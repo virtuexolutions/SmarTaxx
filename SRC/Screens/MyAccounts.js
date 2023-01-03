@@ -24,64 +24,99 @@ import {Icon} from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomText from '../Components/CustomText';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import { validateEmail } from '../Config';
-import { Post } from '../Axios/AxiosInterceptorFunction';
-import { useDispatch } from 'react-redux';
-import { setUserData } from '../Store/slices/common';
-import { setUserLogin, setUserToken } from '../Store/slices/auth';
+import {validateEmail} from '../Config';
+import {Post} from '../Axios/AxiosInterceptorFunction';
+import {useDispatch, useSelector} from 'react-redux';
+import {setUserData} from '../Store/slices/common';
+import {setUserLogin, setUserToken} from '../Store/slices/auth';
+import Bottomtab from '../Components/Bottomtab';
 
-const Signup = () => {
-  const dispatch = useDispatch()
+const MyAccounts = props => {
+  const dispatch = useDispatch();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [designation, setDesignation] = useState('');
-  const [password, setPassword] = useState('');
+  const user = useSelector(state => state.commonReducer.userData);
+  const token = useSelector(state => state.authReducer.token);
+
+  const [firstName, setFirstName] = useState(user?.first_name);
+  const [lastName, setLastName] = useState(user?.last_name);
+  const [designation, setDesignation] = useState(user?.designation);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState({});
-  const [userRole, setUserRole] = useState('Receptionist');
+  console.log("🚀 ~ file: MyAccounts.js:48 ~ MyAccounts ~ image", image?.uri)
+  const [profileImage , setProfileImage] = useState(user?.image)
+  // console.log("🚀 ~ file: MyAccounts.js:49 ~ MyAccounts ~ profileImage", profileImage)
+  const [contact, setContact] = useState(user?.phone);
+  const [email, setEmail] = useState(user?.email);
   const [showModal, setShowModal] = useState(false);
-  const [contact, setContact] = useState('');
-  const [email, setEmail] = useState('');
+  const [userRole, setUserRole] = useState(user?.role);
 
-  const formData = new FormData();
+  // const imageArray = Object.keys(imageObject).length > 0 ?
+  // [{
+  //   uri : imageObject.uri
+  // }]
+  // :
+  // [{
+  //   uri : `${user?.photo}`
+  // }]
 
-
-  const SignUp = async () => {
-   
+  const EditProfile = async () => {
     const params = {
-     
-      role : userRole ,
-      first_name: `${firstName}`,
-      last_name: `${lastName}`,
-      designation : designation,
-      email: email,
-      phone: contact,
-      password: password,
-      c_password: confirmPassword,
+      first_name: firstName,
+      last_name: lastName,
+      designation : designation ,
+      
     };
-    
+    const formdata = new FormData();
+    for (let key in params) {
+      if ([undefined, '', null].includes(params[key])) {
+        return Platform.OS == 'android'
+          ? ToastAndroid.show(
+              `${key.replace(formRegEx, formRegExReplacer)} is empty`,
+              ToastAndroid.SHORT,
+            )
+          : Alert.alert(
+              `${key.replace(formRegEx, formRegExReplacer)} is empty`,
+            );
+      }
+      formdata.append(key, params[key]);
+    }
+    if (Object.keys(image).length > 0) {
+      formdata.append('image', image);
+    }
+    console.log(formdata);
+
+    const url = 'profile-update';
+    setIsLoading(true);
+    const response = await Post(url, formdata, apiHeader(token, true));
+    setIsLoading(false);
+
+    if (response !== undefined) {
+      console.log('response?.data?.data?.user', response?.data);
+      dispatch(setUserData(response?.data?.user_info));
+
+      Platform.OS == 'android'
+        ? ToastAndroid.show('Profile Updated Succesfully', ToastAndroid.SHORT)
+        : Alert.alert('Profile Updated Succesfully');
+    }
+  };
+  const passwordReset = async () => {
+    const params = {
+      current_password: currentPassword,
+      new_password: password,
+      confirm_password: confirmPassword,
+    };
     for (let key in params) {
       if (params[key] === '') {
-        return Platform.OS == 'android'
-          ? ToastAndroid.show(` ${key} field is empty`, ToastAndroid.SHORT)
-          : Alert.alert(` ${key} field is empty`);
+        return (Platform.OS = 'android'
+          ? ToastAndroid.show('Required field is empty', ToastAndroid.SHORT)
+          : Alert.alert('Required field is empty'));
       }
-      formData.append(key , params[key]);
     }
-    formData.append('image',image)
-    console.log(JSON.stringify(formData,null,2))
-    if (isNaN(contact)) {
-      return Platform.OS == 'android'
-        ? ToastAndroid.show('phone is not a number', ToastAndroid.SHORT)
-        : Alert.alert('phone is not a number');
-    }
-    if (!validateEmail(email)) {
-      return Platform.OS == 'android'
-        ? ToastAndroid.show('email is not validate', ToastAndroid.SHORT)
-        : Alert.alert('email is not validate');
-    }
+
+    // Password Length
     if (password.length < 8) {
       return Platform.OS == 'android'
         ? ToastAndroid.show(
@@ -91,26 +126,26 @@ const Signup = () => {
         : Alert.alert('Password should atleast 8 character long');
     }
     if (password != confirmPassword) {
-      return Platform.OS == 'android'
-        ? ToastAndroid.show('Password does not match', ToastAndroid.SHORT)
-        : Alert.alert('Password does not match');
+      return (Platform.OS = 'android'
+        ? ToastAndroid.show('passwords MissMatched !', ToastAndroid.SHORT)
+        : Alert.alert('passwords MissMatched !'));
     }
 
-    const url = 'register';
+    const url = 'change-password';
     setIsLoading(true);
-    const response = await Post(url, formData, apiHeader());
+    const response = await Post(url, params, apiHeader(token));
     setIsLoading(false);
-    if (response != undefined) {
-    //  return  console.log("response?.data", response?.data?.data);
-      Platform.OS === 'android'
-        ? ToastAndroid.show('User Registered Succesfully', ToastAndroid.SHORT)
-        : Alert.alert("User Registered Succesfully");
-        dispatch(setUserData(response?.data?.data?.user_details));
-        dispatch(setUserLogin(response?.data?.data?.token));
-      
+    if (response !== undefined) {
+      Platform.OS == 'android'
+        ? ToastAndroid.show('Password changed successfully', ToastAndroid.SHORT)
+        : alert('Password changed successfully');
+    setCurrentPassword('')
+    setPassword('')
+    setConfirmPassword('')
+
+    
     }
   };
-
   return (
     <>
       <CustomStatusBar backgroundColor={'white'} barStyle={'dark-content'} />
@@ -119,81 +154,64 @@ const Signup = () => {
           flex: 1,
           width: windowWidth,
           height: windowHeight,
-         
         }}
         resizeMode={'stretch'}
         source={require('../Assets/Images/imageBackground.png')}>
-         <KeyboardAwareScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingBottom: moderateScale(20, 0.3),
-              alignItems: 'center',
-              width: '100%',
-              paddingTop: moderateScale(50, 0.3),
-              // backgroundColor  : 'red'
+        <KeyboardAwareScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: moderateScale(100, 0.3),
+            alignItems: 'center',
+            width: '100%',
+            paddingTop: moderateScale(50, 0.3),
+            // backgroundColor  : 'red'
+          }}>
+          <View>
+            {Object.keys(image).length > 0 ? (
+              // console.log('fdaf'),
+              <CustomImage source={{uri: image.uri}} style={styles.image} />
+            ) : (
+              <CustomImage
+                style={styles.image}
+                source={profileImage ? {uri : profileImage} :  require('../Assets/Images/user3.jpg')}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => {
+                setShowModal(true);
+              }}
+              style={styles.edit}>
+              <Icon
+                name="pencil"
+                as={FontAwesome}
+                style={styles.icon2}
+                color={Color.white}
+                size={moderateScale(16, 0.3)}
+              />
+            </TouchableOpacity>
+          </View>
 
-            }}>
-        <View>
-          {Object.keys(image).length > 0 ? (
-            <CustomImage source={{uri: image?.uri}} style={styles.image} />
-          ) : (
-            <CustomImage
-              style={styles.image}
-              source={require('../Assets/Images/user3.jpg')}
+       
+
+          <CardContainer style={styles.container}>
+          <TextInputWithTitle
+              titleText={'Role'}
+              placeholder={'Role'}
+              setText={setUserRole}
+              value={userRole}
+              viewHeight={0.065}
+              viewWidth={0.68}
+              inputWidth={0.55}
+              border={1}
+              borderColor={'#1B5CFB45'}
+              backgroundColor={'#FFFFFF'}
+              marginTop={moderateScale(20, 0.3)}
+              color={Color.themeColor}
+              placeholderColor={Color.themeLightGray}
+              borderRadius={moderateScale(25, 0.3)}
+              elevation
+              disable
             />
-          )}
-          <TouchableOpacity
-            onPress={() => {
-              setShowModal(true);
-            }}
-            style={styles.edit}>
-            <Icon
-              name="pencil"
-              as={FontAwesome}
-              style={styles.icon2}
-              color={Color.white}
-              size={moderateScale(16, 0.3)}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.userTypeContainer}>
-              <View style={styles.innerContainer}>
-                <CustomText style={styles.txt2}>Receptionist</CustomText>
-                <TouchableOpacity
-                  onPress={() => {
-                    setUserRole('Receptionist');
-                  }}
-                  activeOpacity={0.9}
-                  style={[
-                    styles.circle,
-                    userRole == 'Receptionist' && {
-                      backgroundColor: Color.themePink,
-                      borderColor : Color.themeColor
-                    },
-                  ]}></TouchableOpacity>
-              </View>
-              <View style={styles.innerContainer}>
-                <CustomText style={styles.txt2}>Internal Auditor</CustomText>
-                <TouchableOpacity
-                  onPress={() => {
-                    setUserRole('Internal Auditor');
-                  }}
-                  activeOpacity={0.9}
-                  style={[
-                    styles.circle,
-                    userRole == 'Internal Auditor' && {
-                      backgroundColor: Color.themePink,
-                      borderColor : Color.themeColor
-                    },
-                  ]}></TouchableOpacity>
-              </View>
-            </View>
-
-        
-        <CardContainer style={styles.container}>
-          
-
             <TextInputWithTitle
               titleText={'First Name'}
               placeholder={'First Name'}
@@ -261,6 +279,7 @@ const Signup = () => {
               placeholderColor={Color.themeLightGray}
               borderRadius={moderateScale(25, 0.3)}
               elevation
+              disable
             />
             <TextInputWithTitle
               titleText={'Contact'}
@@ -278,10 +297,54 @@ const Signup = () => {
               placeholderColor={Color.themeLightGray}
               borderRadius={moderateScale(25, 0.3)}
               elevation
+              disable
+            />
+          
+            <CustomButton
+              // textTransform={"capitalize"}
+              text={
+                isLoading ? (
+                  <ActivityIndicator color={'#ffffff'} size={'small'} />
+                ) : (
+                  'Update'
+                )
+              }
+              isBold
+              textColor={Color.white}
+              width={windowWidth * 0.75}
+              height={windowHeight * 0.06}
+              marginTop={moderateScale(20, 0.3)}
+              onPress={EditProfile}
+              bgColor={Color.themeColor}
+              borderColor={Color.white}
+              borderWidth={2}
+              borderRadius={moderateScale(30, 0.3)}
+              disabled={isLoading}
+
+            />
+          </CardContainer>
+          <CardContainer style={styles.container}>
+          <TextInputWithTitle
+              titleText={'Current Password'}
+              placeholder={'Current Password'}
+              setText={setCurrentPassword}
+              value={currentPassword}
+              viewHeight={0.065}
+              viewWidth={0.68}
+              inputWidth={0.55}
+              border={1}
+              borderColor={'#1B5CFB45'}
+              backgroundColor={'#FFFFFF'}
+              marginTop={moderateScale(12, 0.3)}
+              color={Color.themeColor}
+              placeholderColor={Color.themeLightGray}
+              borderRadius={moderateScale(25, 0.3)}
+              elevation
+              secureText
             />
             <TextInputWithTitle
-              titleText={'Password'}
-              placeholder={'Password'}
+              titleText={'New Password'}
+              placeholder={'New Password'}
               setText={setPassword}
               value={password}
               viewHeight={0.065}
@@ -295,6 +358,7 @@ const Signup = () => {
               placeholderColor={Color.themeLightGray}
               borderRadius={moderateScale(25, 0.3)}
               elevation
+              secureText
             />
             <TextInputWithTitle
               titleText={'Confirm Password'}
@@ -312,48 +376,41 @@ const Signup = () => {
               placeholderColor={Color.themeLightGray}
               borderRadius={moderateScale(25, 0.3)}
               elevation
+              secureText
             />
-            <CustomButton
+               <CustomButton
+              // textTransform={"capitalize"}
               text={
                 isLoading ? (
-                  <ActivityIndicator color={'#FFFFFF'} size={'small'} />
+                  <ActivityIndicator color={'#ffffff'} size={'small'} />
                 ) : (
-                  'Sign Up'
+                  'Change'
                 )
               }
+              isBold
               textColor={Color.white}
-              width={windowWidth * 0.7}
+              width={windowWidth * 0.75}
               height={windowHeight * 0.06}
               marginTop={moderateScale(20, 0.3)}
-              onPress={() => {
-                SignUp()
-              }}
+              onPress={passwordReset}
               bgColor={Color.themeColor}
+              borderColor={Color.white}
+              borderWidth={2}
               borderRadius={moderateScale(30, 0.3)}
+              disabled={isLoading}
             />
-            <View style={styles.container2}>
-              <CustomText style={styles.txt5}>
-                {'Already have an account? '}
-              </CustomText>
-              <TouchableOpacity
-                style={{marginLeft: windowWidth * 0.01}}
-                onPress={() => navigationService.navigate('LoginScreen')}>
-                <CustomText style={styles.txt4}>{'Sign In'}</CustomText>
-              </TouchableOpacity>
-            </View>
-        </CardContainer>
-          </KeyboardAwareScrollView>
+          </CardContainer>
+        </KeyboardAwareScrollView>
         <ImagePickerModal
           show={showModal}
           setShow={setShowModal}
           setFileObject={setImage}
         />
+        <Bottomtab/>
       </ImageBackground>
     </>
   );
 };
-
-export default Signup;
 
 const styles = ScaledSheet.create({
   container: {
@@ -362,7 +419,8 @@ const styles = ScaledSheet.create({
     marginTop: moderateScale(10, 0.3),
     // maxHeight: windowHeight * 0.7,
     overflow: 'hidden',
-    // backgroundColor : 'green'
+    paddingVertical : moderateScale(20,0.3)
+    // backgroundColor : 'themeColor'
   },
   userTypeContainer: {
     width: windowWidth * 0.7,
@@ -374,7 +432,7 @@ const styles = ScaledSheet.create({
   },
   innerContainer: {
     width: '48%',
-    // backgroundColor : 'green',
+    // backgroundColor : 'themeColor',
     // paddingVertical : moderateScale(5,0.3),
     flexDirection: 'row',
     alignItems: 'center',
@@ -411,7 +469,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(14, 0.6),
     borderBottomWidth: 1,
     borderColor: Color.themeColor,
-    marginBottom : moderateScale(5,0.3)
+    marginBottom: moderateScale(5, 0.3),
   },
   txt5: {
     color: Color.themeLightGray,
@@ -430,7 +488,9 @@ const styles = ScaledSheet.create({
   txt2: {
     fontSize: moderateScale(12, 0.3),
     color: Color.themeColor,
-    fontWeight : 'bold'
+    fontWeight: 'bold',
     // backgroundColor : 'red'
   },
 });
+
+export default MyAccounts;

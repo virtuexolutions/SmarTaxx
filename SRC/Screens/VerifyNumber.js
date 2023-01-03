@@ -69,25 +69,25 @@ const VerifyNumber = props => {
     setIsLoading(true);
     const response = await Post(
       url,
-      {email: 'syedbaber115@gmail.com'},
+      {email: phoneNumber},
       apiHeader(),
     );
     setIsLoading(false);
     if (response != undefined) {
       Platform.OS == 'android'
         ? ToastAndroid.show(
-            `OTP sent to syedbaber115@gmail.com`,
+            `OTP sent to ${phoneNumber}`,
             ToastAndroid.SHORT,
           )
-        : alert(`OTP sent to syedbaber115@gmail.com`);
+        : alert(`OTP sent to ${phoneNumber}`);
     }
   };
 
   const VerifyOTP = async () => {
-    const url = 'verify';
+    const url = 'password/code/check';
     setIsLoading(true);
     console.log(code);
-    const response = await Post(url, {email_code: code}, apiHeader());
+    const response = await Post(url, {code: code}, apiHeader());
     setIsLoading(false);
     if (response != undefined) {
       Platform.OS == 'android'
@@ -198,9 +198,7 @@ const VerifyNumber = props => {
             width={windowWidth * 0.8}
             height={windowHeight * 0.06}
             marginTop={moderateScale(20, 0.3)}
-            onPress={() => {
-              navigationService.navigate('ResetPassword',{phoneNumber : phoneNumber});
-            }}
+            onPress={VerifyOTP}
             bgColor={Color.themeColor}
             borderColor={Color.white}
             borderWidth={2}

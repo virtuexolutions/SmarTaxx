@@ -39,8 +39,8 @@ const ResetPassword = props => {
   const passwordReset = async () => {
     const params = {
       password: password,
-      c_password: confirmPassword,
-      phone: phoneNumber,
+      confirm_password: confirmPassword,
+      email: phoneNumber,
     };
     for (let key in params) {
       if (params[key] === '') {
@@ -71,10 +71,10 @@ const ResetPassword = props => {
     const response = await Post(url, params, apiHeader());
     setIsLoading(false);
     if (response !== undefined) {
-      console.log(response?.data);
-      // dispatch(setIsVerified(response?.data?.data?.user?.isActive));
-      // dispatch(setUserLogin(response?.data));
-      // dispatch(setUserData(response?.data?.data?.user));
+      Platform.OS == 'android'
+      ? ToastAndroid.show(`Password Reset successfully`, ToastAndroid.SHORT)
+      : alert(`Password Reset successfully`);
+      navigationService.navigate('LoginScreen');
     }
   };
   // dispatch(setUserToken('123456'));
@@ -171,7 +171,7 @@ const ResetPassword = props => {
             width={windowWidth * 0.8}
             height={windowHeight * 0.06}
             marginTop={moderateScale(20, 0.3)}
-            onPress={()=>{navigationService.navigate('InternalAuditor')}}
+            onPress={passwordReset}
             bgColor={Color.themeColor}
             borderColor={Color.white}
             borderWidth={2}

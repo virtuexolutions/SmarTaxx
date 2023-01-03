@@ -9,6 +9,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import { Icon } from 'native-base';
 import navigationService from '../navigationService';
 import DocumentScanner from 'react-native-document-scanner-plugin'
+import { useSelector } from 'react-redux';
 
 
 
@@ -16,6 +17,7 @@ import DocumentScanner from 'react-native-document-scanner-plugin'
 
 
 const Bottomtab = ({scannedImage , setScannedImage}) => {
+  const user = useSelector((state)=>state.commonReducer.userData)
     const scanDocument = async () => {
         // start the document scanner
         const { scannedImages } = await DocumentScanner.scanDocument()
@@ -34,7 +36,7 @@ const Bottomtab = ({scannedImage , setScannedImage}) => {
         color={Color.themePink}
         size={moderateScale(30,0.3)}
         onPress={()=>{
-            navigationService.navigate('InternalAuditor')
+            navigationService.navigate(user?.role == 'Receptionist' ? 'Receptionist' : 'InternalAuditor')
         }}
 
 />
@@ -44,6 +46,16 @@ const Bottomtab = ({scannedImage , setScannedImage}) => {
         color={Color.themePink}
         size={moderateScale(30,0.3)}
         onPress={scanDocument}
+        
+/>
+<Icon
+        name='user'
+        as={Entypo}
+        color={Color.themePink}
+        size={moderateScale(30,0.3)}
+        onPress={()=>{
+            navigationService.navigate('MyAccounts')
+        }}
         
 />
 <Icon

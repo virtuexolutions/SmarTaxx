@@ -25,20 +25,20 @@ import CustomImage from './CustomImage';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export const AchievmentCard = ({image, title, checked , onPress , fromOptions , type}) => {
+export const AchievmentCard = ({image, title, checked , onPress , fromOptions , type , completed}) => {
   return (
     <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.smallContainer]}>
       <View
         style={[
           styles.imageContainer,
           {
-            borderWidth: 1,
+            borderWidth: 2,
 
             borderColor: checked == 1 ? 'green' : checked == 2  ? 'red' : 'white',
           },
         ]}>
         <CustomImage
-          source={image}
+          source={type == 'options' ?  image: {uri : image}}
           resizeMode={fromOptions ? 'contain' : 'stretch'}
           style={[{
             width: fromOptions ? '100%' : '100%',
@@ -49,21 +49,24 @@ export const AchievmentCard = ({image, title, checked , onPress , fromOptions , 
         
         ]}
         />
-          {/* {!fromOptions? 
-          
-      //   :
-      //   <Icon
-      //   name={image}
-      //   as={type}
-      //   color={Color.themePink}
-      //   size={moderateScale(30,0.3)}
-      //   onPress={()=>{
-      //       navigationService.navigate('InternalAuditor')
-      //   }}
-      //   />
-          // }*/}
+         
       </View>
       <CustomText style={[styles.txt4]}>{title}</CustomText>
+       { completed &&
+        <Icon
+        name={'check'}
+        as={AntDesign}
+        color={'green.700'}
+        size={moderateScale(30,0.3)}
+        style={{
+          position : 'absolute',
+          right : moderateScale(10,0.3)
+        }}
+        onPress={()=>{
+            navigationService.navigate('InternalAuditor')
+        }}
+        />
+          }
     </TouchableOpacity>
   );
 };

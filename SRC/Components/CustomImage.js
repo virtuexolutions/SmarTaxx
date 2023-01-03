@@ -17,7 +17,8 @@ const CustomImage = (props) => {
         resizeMode={resizeMode}
         style={style}
         source={errorLoadingProfileImage ? errorImageSource : source}
-        onError={() => {
+        onError={(p) => {
+// console.log('errorrrrrrrrr',p);
           setErrorLoadingProfileImage(true);
         }}
       />

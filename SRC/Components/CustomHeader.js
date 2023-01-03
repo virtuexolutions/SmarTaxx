@@ -9,10 +9,13 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import navigationService from '../navigationService';
 import { useNavigation } from '@react-navigation/native';
+import { setUserLogOut } from '../Store/slices/common';
+import { useDispatch } from 'react-redux';
+import { setUserLogoutAuth } from '../Store/slices/auth';
 
 
 const CustomHeader = ({leftIcon, RightIcon, text , style }) => {
-
+  const dispatch = useDispatch()
   const navigation = useNavigation();
 
  
@@ -47,7 +50,9 @@ const CustomHeader = ({leftIcon, RightIcon, text , style }) => {
             right : moderateScale(10,0.3),
         }}
         onPress={()=>{
-            navigationService.navigate('LoginScreen')
+         dispatch(setUserLogOut())
+         dispatch(setUserLogoutAuth())
+
         }}
         />
     }

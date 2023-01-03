@@ -13,21 +13,19 @@ import Signup from './Screens/Signup';
 import EnterPhone from './Screens/EnterPhone';
 import VerifyNumber from './Screens/VerifyNumber';
 import ResetPassword from './Screens/ResetPassword';
+import MyAccounts from './Screens/MyAccounts';
 
 const AppNavigator = () => {
   // const isLogin = false;
   const walkThrough = useSelector(state => state.authReducer.userWalkThrough);
   const token = useSelector(state => state.authReducer.token);
   const user = useSelector(state => state.commonReducer.userData);
-  console.log(
-    '🚀 ~ file: appNavigation.js:22 ~ AppNavigator ~ user',
-    user?.role,
-  );
+
 
   
 
   const RootNav = createNativeStackNavigator();
-  const RootNavLogged = createNativeStackNavigator();
+  // const RootNavLogged = createNativeStackNavigator();
 
   const AppNavigatorContainer = () => {
     const firstScreen = !token
@@ -53,6 +51,8 @@ const AppNavigator = () => {
           <RootNav.Screen name="EnterPhone" component={EnterPhone} />
           <RootNav.Screen name="VerifyNumber" component={VerifyNumber} />
           <RootNav.Screen name="ResetPassword" component={ResetPassword} />
+          <RootNav.Screen name="MyAccounts" component={MyAccounts} />
+
         </RootNav.Navigator>
       </NavigationContainer>
     );
