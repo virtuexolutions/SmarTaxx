@@ -14,6 +14,7 @@ import AppNavigator from './SRC/appNavigation';
 import LoginScreen from './SRC/Screens/LoginScreen';
 import Signup from './SRC/Screens/Receptionist';
 import Receptionist from './SRC/Screens/Receptionist';
+import { Platform } from 'react-native';
 
 
 
@@ -50,7 +51,7 @@ const MainContainer =()=>{
     //      dispatch(SetFCMToken(_token));
     //    })
     //    .catch(() => console.log("token error"));
-    GetPermission();
+   Platform.OS == 'android' && GetPermission();
   }, []);
 
   const [isloading] = useloader(true);
