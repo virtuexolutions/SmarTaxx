@@ -1,5 +1,6 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View, ViewBase} from 'react-native';
+import { moderateScale } from 'react-native-size-matters';
 import {windowHeight} from '../Utillity/utils';
 import CustomStatusBar from './CustomStatusBar';
 import Header from './Header';
@@ -29,7 +30,8 @@ const ScreenBoiler = props => {
   } = props;
 
   return (
-    <>
+    <View style={{
+    }}>
       <CustomStatusBar
         backgroundColor={statusBarBackgroundColor}
         barStyle={statusBarContentStyle}
@@ -53,7 +55,7 @@ const ScreenBoiler = props => {
         />
       )}
       {children}
-    </>
+    </View>
   );
 };
 

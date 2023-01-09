@@ -28,9 +28,12 @@ import {Post} from '../Axios/AxiosInterceptorFunction';
 import {validateEmail} from '../Config';
 import {setUserData} from '../Store/slices/common';
 import {setUserLogin} from '../Store/slices/auth';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import { clockRunning } from 'react-native-reanimated';
 
 const LoginScreen = () => {
+  const user = useSelector((state)=>state.commonReducer.userData);
+  console.log(user)
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [visible, setVisible] = useState(true);
@@ -67,7 +70,7 @@ const LoginScreen = () => {
     const response = await Post(url, body, apiHeader());
     setIsLoading(false);
     if (response != undefined) {
-      console.log(response?.data);
+      console.log('here is the login user data ===> ',response?.data?.data?.user_info);
       // console.log('yes' ,  response?.data?.data?.user_info?.role , loginFor)
       response?.data?.data?.user_info?.role == loginFor
         ? (dispatch(setUserData(response?.data?.data?.user_info)),
@@ -129,11 +132,11 @@ const LoginScreen = () => {
             // minHeight : windowHeight * 0.6,
             // backgroundColor : 'red',
           }}>
-          <Text style={styles.Heading}>FINANCE</Text>
-          <Text style={styles.subHeading}>Welcome Back</Text>
-          <Text style={styles.text}>
+          <CustomText isBold style={[styles.Heading]}>FINANCE</CustomText>
+          <CustomText style={styles.subHeading}>Welcome Back</CustomText>
+          <CustomText style={[styles.text,{width : windowWidth * 0.67}]}>
             Please use your username and password For Login
-          </Text>
+          </CustomText>
           <TextInputWithTitle
             iconName="user-o"
             iconType={FontAwesome}
@@ -177,6 +180,7 @@ const LoginScreen = () => {
             elevation
           />
           <CustomText
+          isBold
             onPress={() => {
               navigationService.navigate('EnterPhone', {fromForgot: true});
             }}
@@ -242,11 +246,12 @@ const LoginScreen = () => {
 
 const styles = ScaledSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // justifyContent: "center",
     height: windowHeight,
     width: windowWidth,
     backgroundColor: Color.white,
+
   },
   bottomImage: {
     width: windowWidth * 0.5,
@@ -282,9 +287,10 @@ const styles = ScaledSheet.create({
   },
   Heading: {
     fontSize: moderateScale(36, 0.3),
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: '#1B5CFB',
     textAlign: 'center',
+    textTransform : 'uppercase'
     // fontFamily : 'serif',
   },
   text: {
@@ -293,8 +299,10 @@ const styles = ScaledSheet.create({
     textAlign: 'center',
     lineHeight: moderateScale(20, 0.3),
     // marginTop: moderateScale(10, 0.3),
-    width: '60%',
+    // width: '70%',
     alignSelf: 'center',
+    // backgroundColor : 'red',
+    // flexWrap : 'wrap'
   },
   emptyBar: {
     width: windowWidth * 0.6,
@@ -310,7 +318,7 @@ const styles = ScaledSheet.create({
     fontSize: moderateScale(10, 0.6),
     alignSelf: 'flex-end',
     marginRight: moderateScale(40, 0.3),
-    fontWeight: '600',
+    // fontWeight: 'bold',
   },
   container2: {
     flexDirection: 'row',

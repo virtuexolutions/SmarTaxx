@@ -37,7 +37,7 @@ const CustomHeader = ({leftIcon, RightIcon, text , style }) => {
       />
       
     }
-      <CustomText style={styles.text}>{text}</CustomText>
+      <CustomText isBold style={styles.text}>{text}</CustomText>
      
      {RightIcon &&
       <Icon
@@ -85,6 +85,6 @@ const styles = StyleSheet.create({
     color: Color.themeColor,
     fontSize : moderateScale(15,0.6),
     alignSelf : 'center',
-    fontWeight : 'bold',
+    // fontWeight : 'bold',
   },
 });

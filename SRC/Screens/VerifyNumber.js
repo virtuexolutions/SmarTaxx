@@ -214,7 +214,7 @@ const styles = ScaledSheet.create({
   txt2: {
     color: Color.themeColor,
     fontSize: moderateScale(25, 0.6),
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   txt3: {
     color: Color.themeLightGray,

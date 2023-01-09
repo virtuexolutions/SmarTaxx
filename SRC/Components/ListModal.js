@@ -36,7 +36,7 @@ const ListModal = ({
           alignItems: 'center',
         }}>
         <View style={styles.header}>
-          <CustomText style={styles.headerText}>{title}</CustomText>
+          <CustomText isBold style={styles.headerText}>{title}</CustomText>
         </View>
         <FlatList
           bounces={false}
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   headerText: {
     color: Color.white,
     fontSize: moderateScale(17, 0.3),
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   header: {
     justifyContent: 'center',

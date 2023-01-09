@@ -16,7 +16,7 @@ const SplashScreen = () => {
   const [visible , setVisible]=useState(false);
   const [firstSection , setFirstSection] = useState(true);
   const [loading , setIsLoading]=useState(1)
-  console.log("🚀 ~ file: SplashScreen.js:19 ~ SplashScreen ~ loading", loading)
+  console.log("🚀 ~ file: SplashScreen.js:19 ~ SplashScreen ~ loading", visible)
 
   const Splash1 = require("../Assets/Images/AccesoriesBig.png");
   const Splash2 = require("../Assets/Images/AccesoriesRight.png");
@@ -180,7 +180,7 @@ const SplashScreen = () => {
 
 const styles = ScaledSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     // justifyContent: "center",
     height: windowHeight,
     width: windowWidth,
@@ -210,7 +210,8 @@ const styles = ScaledSheet.create({
   },
   
   textContainer: {
-    marginTop : moderateScale(20,0.3)
+    marginTop : moderateScale(20,0.3),
+    // backgroundColor : 'red'
   
   },
   textContainer2: {

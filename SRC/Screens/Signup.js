@@ -159,7 +159,7 @@ const Signup = () => {
 
         <View style={styles.userTypeContainer}>
               <View style={styles.innerContainer}>
-                <CustomText style={styles.txt2}>Receptionist</CustomText>
+                <CustomText isBold style={styles.txt2}>Receptionist</CustomText>
                 <TouchableOpacity
                   onPress={() => {
                     setUserRole('Receptionist');
@@ -174,7 +174,7 @@ const Signup = () => {
                   ]}></TouchableOpacity>
               </View>
               <View style={styles.innerContainer}>
-                <CustomText style={styles.txt2}>Internal Auditor</CustomText>
+                <CustomText isBold style={styles.txt2}>Internal Auditor</CustomText>
                 <TouchableOpacity
                   onPress={() => {
                     setUserRole('Internal Auditor');
@@ -430,7 +430,7 @@ const styles = ScaledSheet.create({
   txt2: {
     fontSize: moderateScale(12, 0.3),
     color: Color.themeColor,
-    fontWeight : 'bold'
+    // fontWeight : 'bold'
     // backgroundColor : 'red'
   },
 });

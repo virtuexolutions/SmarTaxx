@@ -67,7 +67,7 @@ export default Thankyou
 
 const styles = ScaledSheet.create({
     container: {
-      flex: 1,
+      // flex: 1,
       // justifyContent: "center",
       height: windowHeight,
       width: windowWidth,

@@ -18,7 +18,7 @@ import {Icon} from 'native-base';
 import Modal from 'react-native-modal';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomText from '../Components/CustomText';
 import {windowHeight, windowWidth} from '../Utillity/utils';
 import Color from '../Assets/Utilities/Color';
@@ -158,7 +158,7 @@ const ImagePickerModal = props => {
           paddingVertical: moderateScale(10, 0.3),
           borderRadius: Dimensions.get('window').width * 0.02,
         }}>
-        <CustomText style={styles.modalHead}>Upload picture</CustomText>
+        <CustomText isBold style={styles.modalHead}>Upload picture</CustomText>
         <View style={styles.modalContentContianer}>
           <TouchableOpacity
             onPress={() => {
@@ -176,7 +176,7 @@ const ImagePickerModal = props => {
                 color: Color.white,
               }}
             />
-            <CustomText style={styles.modalBtnText}>Gallery</CustomText>
+            <CustomText isBold style={styles.modalBtnText}>Gallery</CustomText>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -188,19 +188,19 @@ const ImagePickerModal = props => {
             style={styles.modalContentBtn}>
             <Icon
               name={'camera'}
-              as={FontAwesome5}
+              as={FontAwesome}
               size={moderateScale(25, 0.3)}
               style={{
                 color: Color.white,
               }}
             />
-            <CustomText style={styles.modalBtnText}>Camera</CustomText>
+            <CustomText isBold style={styles.modalBtnText}>Camera</CustomText>
           </TouchableOpacity>
         </View>
         <TouchableOpacity
           onPress={() => setShow(false)}
           style={styles.modalCancelBtn}>
-          <CustomText style={styles.modalBtnText}>Cancel</CustomText>
+          <CustomText isBold style={styles.modalBtnText}>Cancel</CustomText>
         </TouchableOpacity>
       </View>
       {/* <View
@@ -246,7 +246,7 @@ const ImagePickerModal = props => {
           >
             <Icon
               name={"camera"}
-              as={FontAwesome5}
+              as={FontAwesome}
               size={moderateScale(25, 0.3)}
               style={{
                 color: Color.black,
@@ -269,7 +269,7 @@ const ImagePickerModal = props => {
 const styles = ScaledSheet.create({
   modalHead: {
     fontSize: moderateScale(15, 0.3),
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     marginBottom: moderateScale(7.5, 0.3),
   },
   modalContentContianer: {
@@ -291,7 +291,7 @@ const styles = ScaledSheet.create({
     borderRadius: 15,
   },
   modalBtnText: {
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: Color.white,
     fontSize: moderateScale(15, 0.3),
   },

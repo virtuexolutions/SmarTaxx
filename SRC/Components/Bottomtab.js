@@ -9,7 +9,9 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import { Icon } from 'native-base';
 import navigationService from '../navigationService';
 import DocumentScanner from 'react-native-document-scanner-plugin'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserLogOut } from '../Store/slices/common';
+import { setUserLogoutAuth } from '../Store/slices/auth';
 
 
 
@@ -17,6 +19,7 @@ import { useSelector } from 'react-redux';
 
 
 const Bottomtab = ({scannedImage , setScannedImage}) => {
+  const dispatch = useDispatch()
   const user = useSelector((state)=>state.commonReducer.userData)
     const scanDocument = async () => {
         // start the document scanner
@@ -64,7 +67,8 @@ const Bottomtab = ({scannedImage , setScannedImage}) => {
         color={Color.themePink}
         size={moderateScale(30,0.3)}
         onPress={()=>{
-            navigationService.navigate('LoginScreen')
+          dispatch(setUserLogOut())
+         dispatch(setUserLogoutAuth())
         }}
         
 />

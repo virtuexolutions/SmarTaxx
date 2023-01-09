@@ -104,7 +104,7 @@ const EnterPhone = props => {
           />
 
           <CardContainer style={{paddingVertical: moderateScale(30, 0.3)}}>
-            <CustomText style={styles.txt2}>Your Email</CustomText>
+            <CustomText isBold style={styles.txt2}>Your Email</CustomText>
             <CustomText style={styles.txt3}>
               Enter Your Email to Reset password
             </CustomText>
@@ -162,7 +162,7 @@ const styles = ScaledSheet.create({
   txt2: {
     color: Color.black,
     fontSize: moderateScale(20, 0.6),
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   txt3: {
     color: Color.themePink,

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Modal from 'react-native-modal';
 import {windowHeight, windowWidth} from '../Utillity/utils';
@@ -38,7 +38,9 @@ const styles = StyleSheet.create({
     elevation: 9,
     borderRadius : moderateScale(10,0.3),
     alignSelf : 'center',
-    top : moderateScale(20,0.3)
+    top : Platform.OS == 'android' ? moderateScale(20,0.3) : moderateScale(40,0.3),
+    // marginTop : Platform.OS == 'android' ? moderateScale(10,0.3) : moderateScale(25,0.3)
+
     
   },
   absolute: {

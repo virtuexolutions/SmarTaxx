@@ -52,7 +52,7 @@ const CustomAlertModal = (props) => {
       </View>
       <View style={styles.modalLowerView}>
         <View style={{ justifyContent: "center", alignItems: "center" }}>
-          <CustomText style={styles.title}>{title}</CustomText>
+          <CustomText isBold style={styles.title}>{title}</CustomText>
           <CustomText style={styles.message}>{message}</CustomText>
         </View>
         <View
@@ -137,7 +137,7 @@ const styles = ScaledSheet.create({
   },
   title: {
     fontSize: moderateScale(30, 0.3),
-    fontWeight: "bold",
+    // fontWeight: "bold",
     textTransform: "capitalize",
   },
   message: {

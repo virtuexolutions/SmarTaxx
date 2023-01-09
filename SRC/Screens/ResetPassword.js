@@ -110,7 +110,7 @@ const ResetPassword = props => {
         }}>
      
         <CardContainer style={{paddingVertical: moderateScale(30, 0.3)}}>
-          <CustomText style={styles.txt2}>Reset Your Password</CustomText>
+          <CustomText isBold style={styles.txt2}>Reset Your Password</CustomText>
           <CustomText style={styles.txt3}>
             Enter your new password
           </CustomText>
@@ -187,7 +187,7 @@ const styles = ScaledSheet.create({
   txt2: {
     color: Color.themeColor,
     fontSize: moderateScale(25, 0.6),
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   txt3: {
     color: Color.themeLightGray,

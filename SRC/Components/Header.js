@@ -58,6 +58,10 @@ const Header = props => {
           borderWidth: 0.5,
           borderColor: Color.themeLightGray,
         },
+        {
+      paddingTop : Platform.OS == 'android' ? moderateScale(5,0.3) : moderateScale(15,0.3)
+          
+        }
       ]}
     >
       {showBack && (
@@ -85,11 +89,12 @@ const Header = props => {
         </TouchableOpacity>
       )}
       <CustomText
+      isBold
         style={{
           color: titleColor ? titleColor : Color.themeBlack,
           textAlign: 'center',
           fontSize: moderateScale(24, 0.3),
-          fontWeight: 'bold',
+          // fontWeight: 'bold',
         }}
       >
         {title}

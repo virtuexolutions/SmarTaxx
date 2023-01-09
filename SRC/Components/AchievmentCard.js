@@ -51,7 +51,7 @@ export const AchievmentCard = ({image, title, checked , onPress , fromOptions , 
         />
          
       </View>
-      <CustomText style={[styles.txt4]}>{title}</CustomText>
+      <CustomText isBold style={[styles.txt4]}>{title}</CustomText>
        { completed &&
         <Icon
         name={'check'}
@@ -126,7 +126,7 @@ const styles = ScaledSheet.create({
   txt4: {
     color: Color.themeColor,
     fontSize: moderateScale(12, 0.6),
-    fontWeight: '700',
+    // fontWeight: '700',
     marginLeft: moderateScale(20, 0.3),
   },
 });
