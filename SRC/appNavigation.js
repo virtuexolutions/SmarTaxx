@@ -19,7 +19,9 @@ const AppNavigator = () => {
   // const isLogin = false;
   const walkThrough = useSelector(state => state.authReducer.userWalkThrough);
   const token = useSelector(state => state.authReducer.token);
+  console.log("🚀 ~ file: appNavigation.js:22 ~ AppNavigator ~ token", token)
   const user = useSelector(state => state.commonReducer.userData);
+  console.log("🚀 ~ file: appNavigation.js:24 ~ AppNavigator ~ user", user?.role)
 
 
   

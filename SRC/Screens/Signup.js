@@ -70,7 +70,9 @@ const Signup = () => {
       }
       formData.append(key , params[key]);
     }
+    if(Object.keys(image).length > 0){
     formData.append('image',image)
+    }
     console.log(JSON.stringify(formData,null,2))
     if (isNaN(contact)) {
       return Platform.OS == 'android'

@@ -11,10 +11,9 @@ import {
 } from './SRC/Utillity/utils';
 import SplashScreen from './SRC/Screens/SplashScreen';
 import AppNavigator from './SRC/appNavigation';
-import LoginScreen from './SRC/Screens/LoginScreen';
-import Signup from './SRC/Screens/Receptionist';
-import Receptionist from './SRC/Screens/Receptionist';
-import { Platform } from 'react-native';
+// import LoginScreen from './SRC/Screens/LoginScreen';
+// import {StripeProvider} from '@stripe/stripe-react-native';
+
 
 
 
@@ -22,6 +21,11 @@ const App = () => {
 
 
   return (
+  //   <StripeProvider
+  //   publishableKey={"pk_test_qblFNYngBkEdjEZ16jxxoWSM"}
+  //   // merchantIdentifier="merchant.identifier" // required for Apple Pay
+  //   // urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+  // >
    <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
     <NativeBaseProvider>
@@ -31,7 +35,10 @@ const App = () => {
     </PersistGate>
 
    </Provider>
-  );
+  // </StripeProvider>
+  )
+  
+  ;
 };
 
 const MainContainer =()=>{
@@ -40,6 +47,7 @@ const MainContainer =()=>{
 
   useEffect(() => {
     async function GetPermission() {
+      console.log('here');
       await requestCameraPermission();
       await requestWritePermission();
       await requestLocationPermission();
@@ -51,7 +59,7 @@ const MainContainer =()=>{
     //      dispatch(SetFCMToken(_token));
     //    })
     //    .catch(() => console.log("token error"));
-   Platform.OS == 'android' && GetPermission();
+    GetPermission();
   }, []);
 
   const [isloading] = useloader(true);
