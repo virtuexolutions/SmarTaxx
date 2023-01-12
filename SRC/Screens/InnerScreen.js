@@ -88,6 +88,7 @@ const InnerScreen = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [scannedImage, setScannedImage] = useState([]);
   const [signModalVisible, setSignModalVisible] = useState(false);
+  const[signatureImage,setSignatureImage] = useState('');
 
   const Due_Diligence = [
     {
@@ -429,6 +430,7 @@ const InnerScreen = props => {
       const filePath = dirs.DownloadDir+"/"+'signture'+new Date().getMilliseconds()+'.png'
       RNFetchBlob.fs.writeFile(filePath, image_data[1], 'base64')
       .then(() => {
+        setSignatureImage(filePath);
         console.log("Successfuly saved to"+ filePath)
       })
       .catch((errorMessage) =>{
@@ -442,6 +444,7 @@ const InnerScreen = props => {
       const filePath = dirs.DocumentDir+"/"+'signature'+new Date().getMilliseconds()+'.png'
       RNFetchBlob.fs.writeFile(filePath, image_data[1], 'base64')
       .then(() => {
+        setSignatureImage(filePath);
             RNFetchBlob.ios.previewDocument("file://"+filePath)
             console.log("Successfully saved to"+ filePath)
               })
@@ -449,6 +452,7 @@ const InnerScreen = props => {
         console.log(errorMessage)
       })
       }
+      setSignModalVisible(false);
     }
 
   return (
@@ -550,6 +554,12 @@ const InnerScreen = props => {
               ListFooterComponent={() => {
                 return (
                   <>
+                   {signature && 
+                    <CustomImage
+                      resizeMode={"contain"}
+                      style={{ width: windowWidth * 0.3, height: windowHeight * 0.1 , marginTop : moderateScale(20,0.3), borderWidth : 1 , borderColor : Color.themeColor}}
+                      source={{ uri: signature }}
+                    />}
                   
                     <CustomButton
                       text={
@@ -593,10 +603,10 @@ const InnerScreen = props => {
             }}>
 
             <SignatureScreen
-            style={{
-              height : windowHeight * 0.5,
-              backgroundColor : 'red'
-            }}
+            // style={{
+            //   height : windowHeight * 0.5,
+            //   backgroundColor : 'red'
+            // }}
               ref={ref}
               // onEnd={handleEnd}
               onOK={handleOK}
