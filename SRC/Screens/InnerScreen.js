@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   ImageBackground,
+  PermissionsAndroid,
   Platform,
   Text,
   ToastAndroid,
@@ -20,22 +21,20 @@ import Bottomtab from '../Components/Bottomtab';
 import TextInputWithTitle from '../Components/TextInputWithTitle';
 import CardContainer from '../Components/CardContainer';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import { Post } from '../Axios/AxiosInterceptorFunction';
-import { useSelector } from 'react-redux';
+import {Post} from '../Axios/AxiosInterceptorFunction';
+import {useSelector} from 'react-redux';
 import navigationService from '../navigationService';
-import SignatureScreen from "react-native-signature-canvas";
+import SignatureScreen from 'react-native-signature-canvas';
 import CustomImage from '../Components/CustomImage';
+import Modal from 'react-native-modal';
+import RNFetchBlob from "rn-fetch-blob";
 
 const InnerScreen = props => {
-  const token = useSelector((state)=>state.authReducer.token);
+  const token = useSelector(state => state.authReducer.token);
   const name = props?.route?.params?.name;
-  // console.log("🚀 ~ file: InnerScreen.js:29 ~ InnerScreen ~ name", name)
-  const id = props?.route?.params?._id ;
-
-
-  const [signature , setSignature] = useState(null);
-  console.log("🚀 ~ file: InnerScreen.js:37 ~ InnerScreen ~ signature", signature)
-
+  const id = props?.route?.params?._id;
+  const ref = useRef();
+  const [signature, setSignature] = useState(null);
 
   //states for TaxPayer
   const [SSN, setSSN] = useState('');
@@ -88,15 +87,9 @@ const InnerScreen = props => {
   //   console.log("🚀 ~ file: InnerScreen.js:72 ~ InnerScreen ~ arrayForFlatList", arrayForFlatList)
   const [isLoading, setIsLoading] = useState(false);
   const [scannedImage, setScannedImage] = useState([]);
+  const [signModalVisible, setSignModalVisible] = useState(false);
 
   const Due_Diligence = [
-    
-    {
-      name: 'Signatures (Taxpayer or spouse) & (Preparer)',
-      data: Signatures,
-      setData: setSignatures,
-      type : 'Signature'
-    },
     {
       name: 'EITC',
       data: EITC,
@@ -122,7 +115,12 @@ const InnerScreen = props => {
       data: irsNotes,
       setData: setIrsNotes,
     },
-  
+    {
+      name: 'Signatures (Taxpayer or spouse) & (Preparer)',
+      data: Signatures,
+      setData: setSignatures,
+      type: 'Signature',
+    },
   ];
   const TaxPayer = [
     {
@@ -264,13 +262,6 @@ const InnerScreen = props => {
     },
   ];
 
-  const style = `.m-signature-pad--footer
-    .button {
-      background-color: red;
-      color: #FFF;
-   
-    }`;
-
   const InnerScreenHandleSubmit = async () => {
     const body =
       name == 'Taxpayer or spouse'
@@ -365,23 +356,25 @@ const InnerScreen = props => {
         : name == 'Status of Internal Audit'
         ? urlinternal
         : name == 'IRS Status'
-        ? urlIRS 
+        ? urlIRS
         : name == 'Refund/ Invoice'
         ? urlRefund_invoice
-        : urlRefferal
+        : urlRefferal;
 
-      console.log("🚀 ~ file: InnerScreen.js:339 ~ InnerScreenHandleSubmit ~ url_for_Api", url_for_Api , body)
+    console.log(
+      '🚀 ~ file: InnerScreen.js:339 ~ InnerScreenHandleSubmit ~ url_for_Api',
+      url_for_Api,
+      body,
+    );
 
-      setIsLoading(true);
-      const response = await Post(url_for_Api , body , apiHeader(token))
-      setIsLoading(false);
+    setIsLoading(true);
+    const response = await Post(url_for_Api, body, apiHeader(token));
+    setIsLoading(false);
 
-        if(response != undefined){
-          navigationService.navigate('Options',{item : response?.data?.data})
-          console.log(response?.data?.data);
-        }
-
-
+    if (response != undefined) {
+      navigationService.navigate('Options', {item: response?.data?.data});
+      console.log(response?.data?.data);
+    }
   };
 
   //   useEffect(() => {
@@ -406,6 +399,58 @@ const InnerScreen = props => {
   //     };
   //   }, []);
 
+  // Called after ref.current.readSignature() reads a non-empty base64 string
+  const handleOK = signature => {
+    console.log('here ==> in handle');
+    setSignature(signature); // Callback from Component props
+  };
+
+  // Called after ref.current.readSignature() reads an empty string
+  const handleEmpty = () => {
+    Platform.OS == 'android'
+      ? ToastAndroid.show('No sign implemented', ToastAndroid.SHORT)
+      : alert('no sign implenmeted');
+  };
+
+  // Called after ref.current.clearSignature()
+  const handleClear = () => {
+    console.log('here ==> in handle clear success!');
+  };
+
+  const handleSave = async () => {
+    if (Platform.OS === 'android') {
+    var isReadGranted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+    }
+    if (isReadGranted === PermissionsAndroid.RESULTS.GRANTED) {
+      const dirs = RNFetchBlob.fs.dirs
+      var image_data = signature.split('data:image/png;base64,');
+      const filePath = dirs.DownloadDir+"/"+'signture'+new Date().getMilliseconds()+'.png'
+      RNFetchBlob.fs.writeFile(filePath, image_data[1], 'base64')
+      .then(() => {
+        console.log("Successfuly saved to"+ filePath)
+      })
+      .catch((errorMessage) =>{
+        console.log(errorMessage)
+      })      }
+        
+      if (Platform.OS ==='ios') {
+      const dirs = RNFetchBlob.fs.dirs
+      console.log(dirs)
+      var image_data = signature.split('data:image/png;base64,');
+      const filePath = dirs.DocumentDir+"/"+'signature'+new Date().getMilliseconds()+'.png'
+      RNFetchBlob.fs.writeFile(filePath, image_data[1], 'base64')
+      .then(() => {
+            RNFetchBlob.ios.previewDocument("file://"+filePath)
+            console.log("Successfully saved to"+ filePath)
+              })
+      .catch((errorMessage) =>{
+        console.log(errorMessage)
+      })
+      }
+    }
+
   return (
     <>
       <CustomStatusBar backgroundColor={'white'} barStyle={'dark-content'} />
@@ -423,6 +468,7 @@ const InnerScreen = props => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             alignItems: 'center',
+            paddingBottom : moderateScale(50,0.3)
             // backgroundColor : 'red'
           }}>
           <CustomHeader
@@ -458,15 +504,30 @@ const InnerScreen = props => {
               contentContainerStyle={{
                 alignItems: 'center',
                 paddingTop: moderateScale(20, 0.3),
-                paddingBottom: moderateScale(70, 0.3),
+                paddingBottom:  moderateScale(70, 0.3),
                 paddingHorizontal: moderateScale(10, 0.3),
               }}
               renderItem={({item, index}) => {
-                return (
-                  item?.type == 'Signature'
-                  ?
-                  <Sign text={'Please Sign'} onOK={(data)=>{setSignature(data)}}/>
-                  :
+                return item?.type == 'Signature' ? (
+                  <CustomButton
+                    bgColor={Color.themePink}
+                    borderColor={'white'}
+                    borderWidth={1}
+                    textColor={Color.white}
+                    onPress={() => {
+                      setSignModalVisible(true);
+                    }}
+                    width={windowWidth * 0.75}
+                    height={windowHeight * 0.065}
+                    text={'Add your Signature'}
+                    fontSize={moderateScale(16, 0.3)}
+                    borderRadius={moderateScale(30, 0.3)}
+                    textTransform={'uppercase'}
+                    // isGradient={true}
+                    // alignSelfalignSelf={'flex-start'}
+                    marginTop={moderateScale(20, 0.3)}
+                  />
+                ) : (
                   <TextInputWithTitle
                     titleText={item?.name}
                     placeholder={item?.name}
@@ -489,28 +550,23 @@ const InnerScreen = props => {
               ListFooterComponent={() => {
                 return (
                   <>
-                  {signature && 
-                    <CustomImage
-                      resizeMode={"contain"}
-                      style={{ width: 80, height: 100 }}
-                      source={{ uri: signature }}
-                    />}
-                  <CustomButton
-                    text={
-                      isLoading ? (
-                        <ActivityIndicator color={'#FFFFFF'} size={'small'} />
-                      ) : (
-                        'Submit'
-                      )
-                    }
-                    textColor={Color.white}
-                    width={windowWidth * 0.4}
-                    height={windowHeight * 0.06}
-                    marginTop={moderateScale(20, 0.3)}
-                    onPress={InnerScreenHandleSubmit}
-                    bgColor={Color.themeColor}
-                    borderRadius={moderateScale(30, 0.3)}
-                  />
+                  
+                    <CustomButton
+                      text={
+                        isLoading ? (
+                          <ActivityIndicator color={'#FFFFFF'} size={'small'} />
+                        ) : (
+                          'Submit'
+                        )
+                      }
+                      textColor={Color.white}
+                      width={windowWidth * 0.4}
+                      height={windowHeight * 0.06}
+                      marginTop={moderateScale(20, 0.3)}
+                      onPress={InnerScreenHandleSubmit}
+                      bgColor={Color.themeColor}
+                      borderRadius={moderateScale(30, 0.3)}
+                    />
                   </>
                 );
               }}
@@ -521,11 +577,55 @@ const InnerScreen = props => {
           scannedImage={scannedImage}
           setScannedImage={setScannedImage}
         />
+        <Modal
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          isVisible={signModalVisible}
+          hasBackDrop={true}>
+          <View
+            style={{
+              width: windowWidth * 0.95,
+              height : windowHeight * 0.85,
+              borderRadius: moderateScale(20, 0.3),
+              backgroundColor: Color.white,
+            }}>
+
+            <SignatureScreen
+            style={{
+              height : windowHeight * 0.5,
+              backgroundColor : 'red'
+            }}
+              ref={ref}
+              // onEnd={handleEnd}
+              onOK={handleOK}
+              onEmpty={handleEmpty}
+              onClear={handleClear}
+              autoClear={true}
+              descriptionText={'Draw Signature'}
+              penColor={Color.themePink}
+            />
+            {signature &&
+             <CustomButton
+                      text={'Save Signature'}
+                      textColor={Color.white}
+                      width={windowWidth * 0.4}
+                      height={windowHeight * 0.06}
+                      marginTop={moderateScale(-20, 0.3)}
+                      onPress={handleSave}
+                      bgColor={Color.themeColor}
+                      borderRadius={moderateScale(30, 0.3)}
+                    />
+            }
+          </View>
+        </Modal>
       </ImageBackground>
     </>
   );
 };
 
+export default InnerScreen;
 const styles = ScaledSheet.create({
   cardContainer: {
     marginTop: moderateScale(20, 0.3),
@@ -533,48 +633,3 @@ const styles = ScaledSheet.create({
     // height : windowHeight * 0.7,
   },
 });
-export default InnerScreen;
-const Sign = ({ text, onOK }) => {
-  const ref = useRef();
-
-  // Called after ref.current.readSignature() reads a non-empty base64 string
-  const handleOK = (signature) => {
-    console.log(signature);
-    onOK(signature); // Callback from Component props
-  };
-
-  // Called after ref.current.readSignature() reads an empty string
-  const handleEmpty = () => {
-    console.log("Empty");
-  };
-
-  // Called after ref.current.clearSignature()
-  const handleClear = () => {
-    console.log("clear success!");
-  };
-
-  // Called after end of stroke
-  const handleEnd = () => {
-    ref.current.readSignature();
-  };
-
-  // Called after ref.current.getData()
-  const handleData = (data) => {
-    console.log(data);
-  };
-
-  return (
-    <SignatureScreen
-      ref={ref}
-      onEnd={handleEnd}
-      onOK={handleOK}
-      onEmpty={handleEmpty}
-      onClear={handleClear}
-      onGetData={handleData}
-      autoClear={true}
-      descriptionText={text}
-    />
-  );
-};
-
-
