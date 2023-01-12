@@ -16,7 +16,7 @@ const SplashScreen = () => {
   const [visible , setVisible]=useState(false);
   const [firstSection , setFirstSection] = useState(true);
   const [loading , setIsLoading]=useState(1)
-  console.log("🚀 ~ file: SplashScreen.js:19 ~ SplashScreen ~ loading", visible)
+  // console.log("🚀 ~ file: SplashScreen.js:19 ~ SplashScreen ~ loading", visible)
 
   const Splash1 = require("../Assets/Images/AccesoriesBig.png");
   const Splash2 = require("../Assets/Images/AccesoriesRight.png");

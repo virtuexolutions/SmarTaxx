@@ -79,12 +79,15 @@ const styles = StyleSheet.create({
     shadowRadius: 11.14,
     
     elevation: 17,
-    alignSelf : 'center'
+    alignSelf : 'center',
+    // borderWidth : 1,
+    // borderColor : Color.themeColor,
   },
   text : {
     color: Color.themeColor,
     fontSize : moderateScale(15,0.6),
     alignSelf : 'center',
+
     // fontWeight : 'bold',
   },
 });

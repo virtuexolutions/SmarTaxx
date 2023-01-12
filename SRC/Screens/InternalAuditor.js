@@ -37,9 +37,10 @@ const InternalAuditor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [flatListArray , setFlatListArray] = useState([])
-  // console.log("🚀 ~ file: InternalAuditor.js:39 ~ InternalAuditor ~ data", flatListArray)
   const [visible, setVisible] = useState(false);
-
+  // const data1 = JSON.parse(flatListArray[flatListArray.length-1]?.photos)
+  // console.log("🚀 ~ file: InternalAuditor.js:42 ~ InternalAuditor ~ data1", data1)
+  
   const dummyData = [
     {
       name: 'Bradley D. Harvey',
@@ -106,7 +107,6 @@ const InternalAuditor = () => {
   }, [data]);
 
   const getData = async () => {
-    console.log('hererrrrr');
     const url = 'receptionist';
     setIsLoading(true);
     const response = await Get(url, token);
@@ -171,6 +171,7 @@ const InternalAuditor = () => {
               paddingBottom: moderateScale(100, 0.3),
             }}
             renderItem={({item, index}) => {
+              // console.log(item?.photos);
               return (
                 <AchievmentCard
                   image={item?.image}
@@ -182,6 +183,7 @@ const InternalAuditor = () => {
                       item: item,
                     });
                   }}
+                  imagesArray={JSON.parse(item?.photos)}
                 />
               );
             }}

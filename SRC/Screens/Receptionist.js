@@ -9,6 +9,8 @@ import TextInputWithTitle from '../Components/TextInputWithTitle';
 import CustomButton from '../Components/CustomButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
+
 import Color from '../Assets/Utilities/Color';
 import ListModal from '../Components/ListModal';
 import navigationService from '../navigationService';
@@ -17,7 +19,7 @@ import Bottomtab from '../Components/Bottomtab';
 import {Post} from '../Axios/AxiosInterceptorFunction';
 import ImagePickerModal from '../Components/ImagePickerModal';
 import CustomImage from '../Components/CustomImage';
-import { Icon } from 'native-base';
+import { FlatList, Icon } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CustomAlertModal from '../Components/CustomAlertModal';
 import { useEffect } from 'react';
@@ -33,11 +35,14 @@ const Receptionist = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisble] = useState(false);
   const [image, setImage] = useState({});
-  console.log("🚀 ~ file: Receptionist.js:32 ~ Receptionist ~ image", image)
+  // console.log("🚀 ~ file: Receptionist.js:32 ~ Receptionist ~ image", image)
   const [showModal, setShowModal] = useState(false);
-  const [visible , setVisible] = useState(false)
+  const [visible , setVisible] = useState(false);
+  const [multiImages , setMultiImages] = useState([]) ;
+  console.log("🚀 ~ file: Receptionist.js:42 ~ Receptionist ~ multiImages", JSON.stringify(multiImages,null,2))
+  const [showMultiImageModal , setShowMultiImageModal] = useState(false);
 
-
+  
   const saveRecord = async () => {
     const url = 'receptionist';
     const body = {
@@ -46,8 +51,9 @@ const Receptionist = () => {
       ssn: ssn,
       cross_link: crossLink,
       image: image,
-    };
-
+      // photos : multiImages,
+   };
+    
     const formData = new FormData();
 
     for (let key in body) {
@@ -56,7 +62,16 @@ const Receptionist = () => {
       }
       formData.append(key, body[key]);
     }
-    // return console.log(formData);
+    for (var i = 0; i < multiImages.length; i++)
+    {
+      if (multiImages[i] == '' || Object.keys(multiImages[i]).length <=0) {
+        return alert(`${key} is required`);
+      }
+      formData.append(`photos[${i}]`, multiImages[i]);
+    }
+    
+
+    console.log('dfasdasfasdasdasdasdad === > ',formData);
     if(isNaN(ssn)){
       return alert('SSN must be in numbers');
     }
@@ -70,6 +85,8 @@ const Receptionist = () => {
     if(response != undefined){
      Platform.OS == 'android' ?
      ToastAndroid.show('Record added successfully' , ToastAndroid.SHORT) : alert('Record added successfully')
+     navigationService.navigate('Thankyou');
+
     }
   };
   useEffect(() => {
@@ -206,6 +223,73 @@ const Receptionist = () => {
             }}
             disable
           />
+          <View style={styles.imagesContainer}>
+            <FlatList
+            horizontal
+            data={multiImages}
+            showsHorizontalScrollIndicator={false}
+            style={{
+              // backgroundColor : 'red',
+              flexGrow : 0
+            }}
+            renderItem={({item , index}) => {
+              console.log("🚀 ~ file: Receptionist.js:342 ~ Receptionist ~ item", item?.uri)
+            
+              return(
+                <View style={[styles.addImageContainer,{borderWidth : 0 , borderRadius : moderateScale(10,0.3)}]}>
+                <Icon
+                name={'close'}
+                as={FontAwesome}
+                color={Color.themeColor}
+                size={moderateScale(12,0.3)}
+                style={{
+                  position : 'absolute',
+                  right : 1,
+                  top : 1,
+                  zIndex : 1
+                }}
+                onPress={()=>{
+                  let newArray = [...multiImages];
+                  newArray.splice(index , 1);
+                   setMultiImages(newArray);
+                }}
+                />  
+                  {/* <CustomImage source={{uri: item.uri}}  /> */}
+                <CustomImage
+                source={{uri : item?.uri}}
+                resizeMode={'stretch'}
+                style={{
+                  width : moderateScale(50,0.3),
+                  height : moderateScale(60,0.3)
+                }}
+                
+                />
+                {/* <Icon
+                name={'images'}
+                as={Entypo}
+                color={Color.themeColor}
+                size={moderateScale(25,0.3)}
+                /> */}
+              </View>
+              )
+            }}
+            />
+
+            <View style={styles.addImageContainer}>
+              <Icon
+              name={'plus'}
+              as={AntDesign}
+              color={Color.themeColor}
+              size={moderateScale(30,0.3)}
+              onPress={()=>{
+                setShowMultiImageModal(true);
+              }}
+              />
+            </View>
+          </View>
+
+
+
           <CustomButton
             text={
               isLoading ? (
@@ -220,7 +304,6 @@ const Receptionist = () => {
             marginTop={moderateScale(20, 0.3)}
             onPress={() => {
               saveRecord();
-              navigationService.navigate('Thankyou');
             }}
             bgColor={Color.themeColor}
             borderRadius={moderateScale(30, 0.3)}
@@ -246,6 +329,13 @@ const Receptionist = () => {
           show={showModal}
           setShow={setShowModal}
           setFileObject={setImage}
+        />
+          <ImagePickerModal
+          show={showMultiImageModal}
+          setShow={setShowMultiImageModal}
+          setMultiImages={setMultiImages}
+          // setFileObject={setImage}
+          
         />
         <Bottomtab />
         <CustomAlertModal
@@ -296,5 +386,35 @@ const styles = ScaledSheet.create({
     borderRadius: moderateScale(49, 0.3),
     marginLeft: moderateScale(2.5, 0.3),
     marginTop: moderateScale(2.5, 0.3),
+  },
+  addImageContainer : {
+    width : windowWidth * 0.14 ,
+    backgroundColor : Color.white,
+    borderRadius : moderateScale(5,0.3),
+    borderWidth : 2,
+    borderColor : Color.themePink,
+    height : windowHeight * 0.07,
+    justifyContent : 'center',
+    alignItems : 'center',
+    marginRight : moderateScale(10,0.3),
+    marginTop : moderateScale(5,0.3),
+    shadowColor: Color.themeColor,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
+    
+    elevation: 9,
+    overflow : 'hidden'
+  },
+  imagesContainer : {
+    marginTop : moderateScale(10,0.3),
+    width : windowWidth * 0.7,
+    marginLeft : moderateScale(10,0.3),
+    flexWrap : 'wrap',
+    flexDirection : 'row'
+
   },
 });

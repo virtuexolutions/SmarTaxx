@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -19,54 +19,124 @@ import {apiHeader, windowHeight, windowWidth} from '../Utillity/utils';
 import {Icon, ScrollView} from 'native-base';
 import CardContainer from '../Components/CardContainer';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {LineChart} from 'react-native-chart-kit';
 import CustomImage from './CustomImage';
+import ImageView from 'react-native-image-viewing';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-export const AchievmentCard = ({image, title, checked , onPress , fromOptions , type , completed}) => {
+export const AchievmentCard = ({
+  image,
+  title,
+  checked,
+  onPress,
+  fromOptions,
+  type,
+  completed,
+  imagesArray,
+}) => {
+  const [ImageArrayCustom, setImageArrayCustom] = useState([]);
+  // console.log("🚀 ~ file: AchievmentCard.js:41 ~ ImageArrayCustom", ImageArrayCustom)
+  const [isVisible, setIsVisible] = useState(false);
+  console.log("🚀 ~ file: AchievmentCard.js:42 ~ isVisible", isVisible)
+  // console.log(
+  //   '🚀 ~ file: AchievmentCard.js:31 ~ AchievmentCard ~ fromOptions',
+  
+  //   imagesArray,
+  //   typeof(imagesArray),
+  //   imagesArray.length,
+  // );
+
+  useEffect(() => {
+    setImageArrayCustom([]);
+    if (fromOptions == undefined) {
+        imagesArray.map((x, index) => {
+          return (
+      setImageArrayCustom((prev)=>[...prev,{uri : x}])
+
+          )
+        })
+      
+    }
+  }, []);
+
   return (
-    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.smallContainer]}>
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={onPress}
+      style={[styles.smallContainer]}>
       <View
         style={[
           styles.imageContainer,
           {
             borderWidth: 2,
 
-            borderColor: checked == 1 ? 'green' : checked == 2  ? 'red' : 'white',
+            borderColor:
+              checked == 1 ? 'green' : checked == 2 ? 'red' : 'white',
           },
         ]}>
         <CustomImage
-          source={type == 'options' ?  image: {uri : image}}
+          source={type == 'options' ? image : {uri: image}}
           resizeMode={fromOptions ? 'contain' : 'stretch'}
-          style={[{
-            width: fromOptions ? '100%' : '100%',
-            height: fromOptions ? '70%' : '100%',
-            // backgroundColor : 'green',
-            
-          },
-        
-        ]}
+          style={[
+            {
+              width: fromOptions ? '100%' : '100%',
+              height: fromOptions ? '70%' : '100%',
+              // backgroundColor : 'green',
+            },
+          ]}
         />
-         
       </View>
-      <CustomText isBold style={[styles.txt4]}>{title}</CustomText>
-       { completed &&
+     
+      <CustomText isBold style={[styles.txt4]}>
+        {title}
+      </CustomText>
+      {completed && (
         <Icon
-        name={'check'}
-        as={AntDesign}
-        color={'green.700'}
-        size={moderateScale(30,0.3)}
-        style={{
-          position : 'absolute',
-          right : moderateScale(10,0.3)
-        }}
-        onPress={()=>{
-            navigationService.navigate('InternalAuditor')
-        }}
+          name={'check'}
+          as={AntDesign}
+          color={'green.700'}
+          size={moderateScale(30, 0.3)}
+          style={{
+            position: 'absolute',
+            right: moderateScale(10, 0.3),
+           
+          }}
+        
         />
-          }
+      )}
+       {!fromOptions && (
+        <Icon
+          name="md-documents-sharp"
+          as={Ionicons}
+          color={Color.themePink}
+          size={moderateScale(15, 0.3)}
+          style={{
+            position: 'absolute',
+            // alignSelf : 'flex-end',
+            top: moderateScale(10, 0.3),
+            right: moderateScale(5, 0.3),
+            // zIndex : 1,
+            // backgroundColor : 'red'
+          }}
+          onPress={() => {
+            // console.log('hello');
+            setIsVisible(true);
+          }}
+          hitSlop={moderateScale(20,0.3)}
+        />
+      )} 
+
+      <ImageView
+        images={ImageArrayCustom}
+        imageIndex={0}
+        visible={isVisible}
+        onRequestClose={() => {
+          setIsVisible(false);
+        }}
+      />
     </TouchableOpacity>
   );
 };
@@ -119,7 +189,7 @@ const styles = ScaledSheet.create({
     width: 60,
     height: 50,
     overflow: 'hidden',
-    justifyContent : 'center',
+    justifyContent: 'center',
     // alignItems : 'center'
   },
 

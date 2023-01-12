@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -23,12 +23,18 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import { Post } from '../Axios/AxiosInterceptorFunction';
 import { useSelector } from 'react-redux';
 import navigationService from '../navigationService';
+import SignatureScreen from "react-native-signature-canvas";
+import CustomImage from '../Components/CustomImage';
 
 const InnerScreen = props => {
   const token = useSelector((state)=>state.authReducer.token);
   const name = props?.route?.params?.name;
-  console.log("🚀 ~ file: InnerScreen.js:29 ~ InnerScreen ~ name", name)
+  // console.log("🚀 ~ file: InnerScreen.js:29 ~ InnerScreen ~ name", name)
   const id = props?.route?.params?._id ;
+
+
+  const [signature , setSignature] = useState(null);
+  console.log("🚀 ~ file: InnerScreen.js:37 ~ InnerScreen ~ signature", signature)
 
 
   //states for TaxPayer
@@ -84,6 +90,13 @@ const InnerScreen = props => {
   const [scannedImage, setScannedImage] = useState([]);
 
   const Due_Diligence = [
+    
+    {
+      name: 'Signatures (Taxpayer or spouse) & (Preparer)',
+      data: Signatures,
+      setData: setSignatures,
+      type : 'Signature'
+    },
     {
       name: 'EITC',
       data: EITC,
@@ -109,11 +122,7 @@ const InnerScreen = props => {
       data: irsNotes,
       setData: setIrsNotes,
     },
-    {
-      name: 'Signatures (Taxpayer or spouse) & (Preparer)',
-      data: Signatures,
-      setData: setSignatures,
-    },
+  
   ];
   const TaxPayer = [
     {
@@ -254,6 +263,13 @@ const InnerScreen = props => {
       setData: setPhoneNumber,
     },
   ];
+
+  const style = `.m-signature-pad--footer
+    .button {
+      background-color: red;
+      color: #FFF;
+   
+    }`;
 
   const InnerScreenHandleSubmit = async () => {
     const body =
@@ -447,6 +463,10 @@ const InnerScreen = props => {
               }}
               renderItem={({item, index}) => {
                 return (
+                  item?.type == 'Signature'
+                  ?
+                  <Sign text={'Please Sign'} onOK={(data)=>{setSignature(data)}}/>
+                  :
                   <TextInputWithTitle
                     titleText={item?.name}
                     placeholder={item?.name}
@@ -468,6 +488,13 @@ const InnerScreen = props => {
               }}
               ListFooterComponent={() => {
                 return (
+                  <>
+                  {signature && 
+                    <CustomImage
+                      resizeMode={"contain"}
+                      style={{ width: 80, height: 100 }}
+                      source={{ uri: signature }}
+                    />}
                   <CustomButton
                     text={
                       isLoading ? (
@@ -484,6 +511,7 @@ const InnerScreen = props => {
                     bgColor={Color.themeColor}
                     borderRadius={moderateScale(30, 0.3)}
                   />
+                  </>
                 );
               }}
             />
@@ -506,3 +534,47 @@ const styles = ScaledSheet.create({
   },
 });
 export default InnerScreen;
+const Sign = ({ text, onOK }) => {
+  const ref = useRef();
+
+  // Called after ref.current.readSignature() reads a non-empty base64 string
+  const handleOK = (signature) => {
+    console.log(signature);
+    onOK(signature); // Callback from Component props
+  };
+
+  // Called after ref.current.readSignature() reads an empty string
+  const handleEmpty = () => {
+    console.log("Empty");
+  };
+
+  // Called after ref.current.clearSignature()
+  const handleClear = () => {
+    console.log("clear success!");
+  };
+
+  // Called after end of stroke
+  const handleEnd = () => {
+    ref.current.readSignature();
+  };
+
+  // Called after ref.current.getData()
+  const handleData = (data) => {
+    console.log(data);
+  };
+
+  return (
+    <SignatureScreen
+      ref={ref}
+      onEnd={handleEnd}
+      onOK={handleOK}
+      onEmpty={handleEmpty}
+      onClear={handleClear}
+      onGetData={handleData}
+      autoClear={true}
+      descriptionText={text}
+    />
+  );
+};
+
+

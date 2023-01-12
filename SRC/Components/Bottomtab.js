@@ -8,7 +8,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { Icon } from 'native-base';
 import navigationService from '../navigationService';
-import DocumentScanner from 'react-native-document-scanner-plugin'
+// import DocumentScanner from 'react-native-document-scanner-plugin'
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserLogOut } from '../Store/slices/common';
 import { setUserLogoutAuth } from '../Store/slices/auth';
@@ -21,16 +21,16 @@ import { setUserLogoutAuth } from '../Store/slices/auth';
 const Bottomtab = ({scannedImage , setScannedImage}) => {
   const dispatch = useDispatch()
   const user = useSelector((state)=>state.commonReducer.userData)
-    const scanDocument = async () => {
-        // start the document scanner
-        const { scannedImages } = await DocumentScanner.scanDocument()
+    // const scanDocument = async () => {
+    //     // start the document scanner
+    //     const { scannedImages } = await DocumentScanner.scanDocument()
       
-        // get back an array with scanned image file paths
-        if (scannedImages.length > 0) {
-          // set the img src, so we can view the first scanned image
-          setScannedImage(scannedImages[0])
-        }
-      }
+    //     // get back an array with scanned image file paths
+    //     if (scannedImages.length > 0) {
+    //       // set the img src, so we can view the first scanned image
+    //       setScannedImage(scannedImages[0])
+    //     }
+    //   }
   return (
     <View style={styles.container}>
         <Icon
@@ -43,14 +43,14 @@ const Bottomtab = ({scannedImage , setScannedImage}) => {
         }}
 
 />
-<Icon
+{/* <Icon
         name='scan1'
         as={AntDesign}
         color={Color.themePink}
         size={moderateScale(30,0.3)}
         onPress={scanDocument}
         
-/>
+/> */}
 <Icon
         name='user'
         as={Entypo}
