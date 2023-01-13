@@ -118,8 +118,8 @@ const InnerScreen = props => {
     },
     {
       name: 'Signatures (Taxpayer or spouse) & (Preparer)',
-      data: Signatures,
-      setData: setSignatures,
+      data: signature,
+      setData: setSignature,
       type: 'Signature',
     },
   ];
@@ -285,7 +285,7 @@ const InnerScreen = props => {
             actc: ACTC,
             aotc: AOTC,
             irs_notes: irsNotes,
-            signature: Signatures,
+            signature: signature,
           }
         : name == 'Refund Dispersement'
         ? {
@@ -338,8 +338,11 @@ const InnerScreen = props => {
     const urlRefferal = 'refferals';
     // console.log(body);
 
+    const formData = new FormData()
+
     for (let key in body) {
       if (['', null, undefined].includes(body[key])) {
+        name == 'Due Diligence verification' && formData.append(key , body[key]);
         return Platform.OS == 'android'
           ? ToastAndroid.show('All fields are required', ToastAndroid.SHORT)
           : alert('All fields are required');
@@ -369,7 +372,7 @@ const InnerScreen = props => {
     );
 
     setIsLoading(true);
-    const response = await Post(url_for_Api, body, apiHeader(token));
+    const response = await Post(url_for_Api, name == 'Due Diligence verification' ? formData : body, apiHeader(token));
     setIsLoading(false);
 
     if (response != undefined) {
