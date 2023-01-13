@@ -5,6 +5,7 @@ import {
   BackHandler,
   FlatList,
   ImageBackground,
+  RefreshControl,
   Text,
   View,
 } from 'react-native';
@@ -36,53 +37,54 @@ const InternalAuditor = () => {
   // );
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [flatListArray , setFlatListArray] = useState([])
+  const [flatListArray , setFlatListArray] = useState([]);
   const [visible, setVisible] = useState(false);
-  // const data1 = JSON.parse(flatListArray[flatListArray.length-1]?.photos)
-  // console.log("🚀 ~ file: InternalAuditor.js:42 ~ InternalAuditor ~ data1", data1)
+  const [refreshing, setRefreshing] =useState(false);
   
-  const dummyData = [
-    {
-      name: 'Bradley D. Harvey',
-      image: require('../Assets/Images/dummyUser.png'),
-      checkDone: 2,
-    },
-    {
-      name: 'Dawn C. Peterson',
-      image: require('../Assets/Images/dummyUser1.png'),
-      checkDone: 1,
-    },
-    {
-      name: 'David L. Newberry',
-      image: require('../Assets/Images/dummyUser.png'),
-      checkDone: 2,
-    },
-    {
-      name: 'Nellie D. Hendrickson',
-      image: require('../Assets/Images/dummyUser1.png'),
-      checkDone: 1,
-    },
-    {
-      name: 'Dean K. Kim',
-      image: require('../Assets/Images/dummyUser.png'),
-      checkDone: 2,
-    },
-    {
-      name: 'Robert T. Pearman',
-      image: require('../Assets/Images/dummyUser1.png'),
-      checkDone: 2,
-    },
-    {
-      name: 'Robert T. Pearman',
-      image: require('../Assets/Images/dummyUser.png'),
-      checkDone: 2,
-    },
-    {
-      name: 'Bradley D. Harvey',
-      image: require('../Assets/Images/dummyUser1.png'),
-      checkDone: 2,
-    },
-  ];
+
+  
+  // const dummyData = [
+  //   {
+  //     name: 'Bradley D. Harvey',
+  //     image: require('../Assets/Images/dummyUser.png'),
+  //     checkDone: 2,
+  //   },
+  //   {
+  //     name: 'Dawn C. Peterson',
+  //     image: require('../Assets/Images/dummyUser1.png'),
+  //     checkDone: 1,
+  //   },
+  //   {
+  //     name: 'David L. Newberry',
+  //     image: require('../Assets/Images/dummyUser.png'),
+  //     checkDone: 2,
+  //   },
+  //   {
+  //     name: 'Nellie D. Hendrickson',
+  //     image: require('../Assets/Images/dummyUser1.png'),
+  //     checkDone: 1,
+  //   },
+  //   {
+  //     name: 'Dean K. Kim',
+  //     image: require('../Assets/Images/dummyUser.png'),
+  //     checkDone: 2,
+  //   },
+  //   {
+  //     name: 'Robert T. Pearman',
+  //     image: require('../Assets/Images/dummyUser1.png'),
+  //     checkDone: 2,
+  //   },
+  //   {
+  //     name: 'Robert T. Pearman',
+  //     image: require('../Assets/Images/dummyUser.png'),
+  //     checkDone: 2,
+  //   },
+  //   {
+  //     name: 'Bradley D. Harvey',
+  //     image: require('../Assets/Images/dummyUser1.png'),
+  //     checkDone: 2,
+  //   },
+  // ];
 
   useEffect(() => {
     setFlatListArray([]);
@@ -106,11 +108,11 @@ const InternalAuditor = () => {
      } );
   }, [data]);
 
-  const getData = async () => {
+  const getData = async (type) => {
     const url = 'receptionist';
-    setIsLoading(true);
+    type == 'refreshing' ? setRefreshing(true) : setIsLoading(true);
     const response = await Get(url, token);
-    setIsLoading(false);
+    type == 'refreshing' ? setRefreshing(false) : setIsLoading(false);
     if (response != undefined) {
      response?.data?.receptionist.map((x,index)=>{
       return setData((prev)=>[...prev , {...x , checkDone : ''}])
@@ -122,7 +124,7 @@ const InternalAuditor = () => {
 
   useEffect(() => {
     setData([])
-    getData();
+    getData('initial');
   }, [focused]);
 
   useEffect(() => {
@@ -160,6 +162,11 @@ const InternalAuditor = () => {
           </View>
         ) : (
           <FlatList
+            refreshControl={<RefreshControl
+            refreshing={refreshing} onRefresh={()=>{setData([]), getData('refreshing')}}
+            colors={[Color.themeColor , Color.themePink]}
+            />}
+            
             data={flatListArray}
             showsVerticalScrollIndicator={false}
             style={{
@@ -184,7 +191,9 @@ const InternalAuditor = () => {
                     });
                   }}
                   imagesArray={JSON.parse(item?.photos)}
+                item={item}
                 />
+
               );
             }}
             ListEmptyComponent={() => {
