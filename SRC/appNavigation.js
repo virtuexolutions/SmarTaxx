@@ -14,6 +14,7 @@ import EnterPhone from './Screens/EnterPhone';
 import VerifyNumber from './Screens/VerifyNumber';
 import ResetPassword from './Screens/ResetPassword';
 import MyAccounts from './Screens/MyAccounts';
+import EmployeeReport from './Screens/EmployeeReport';
 
 const AppNavigator = () => {
   // const isLogin = false;
@@ -54,6 +55,8 @@ const AppNavigator = () => {
           <RootNav.Screen name="VerifyNumber" component={VerifyNumber} />
           <RootNav.Screen name="ResetPassword" component={ResetPassword} />
           <RootNav.Screen name="MyAccounts" component={MyAccounts} />
+          <RootNav.Screen name="EmployeeReport" component={EmployeeReport} />
+
 
         </RootNav.Navigator>
       </NavigationContainer>

@@ -23,6 +23,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {LineChart} from 'react-native-chart-kit';
 import CustomImage from './CustomImage';
 import ImageView from 'react-native-image-viewing';
+import navigationService from '../navigationService';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -36,29 +37,18 @@ export const AchievmentCard = ({
   type,
   completed,
   imagesArray,
+  item,
 }) => {
   const [ImageArrayCustom, setImageArrayCustom] = useState([]);
   // console.log("🚀 ~ file: AchievmentCard.js:41 ~ ImageArrayCustom", ImageArrayCustom)
   const [isVisible, setIsVisible] = useState(false);
-  console.log("🚀 ~ file: AchievmentCard.js:42 ~ isVisible", isVisible)
-  // console.log(
-  //   '🚀 ~ file: AchievmentCard.js:31 ~ AchievmentCard ~ fromOptions',
-  
-  //   imagesArray,
-  //   typeof(imagesArray),
-  //   imagesArray.length,
-  // );
 
   useEffect(() => {
     setImageArrayCustom([]);
     if (fromOptions == undefined) {
-        imagesArray.map((x, index) => {
-          return (
-      setImageArrayCustom((prev)=>[...prev,{uri : x}])
-
-          )
-        })
-      
+      imagesArray.map((x, index) => {
+        return setImageArrayCustom(prev => [...prev, {uri: x}]);
+      });
     }
   }, []);
 
@@ -89,7 +79,7 @@ export const AchievmentCard = ({
           ]}
         />
       </View>
-     
+
       <CustomText isBold style={[styles.txt4]}>
         {title}
       </CustomText>
@@ -102,12 +92,10 @@ export const AchievmentCard = ({
           style={{
             position: 'absolute',
             right: moderateScale(10, 0.3),
-           
           }}
-        
         />
       )}
-       {!fromOptions && (
+      {!fromOptions && (
         <Icon
           name="md-documents-sharp"
           as={Ionicons}
@@ -125,9 +113,36 @@ export const AchievmentCard = ({
             // console.log('hello');
             setIsVisible(true);
           }}
-          hitSlop={moderateScale(20,0.3)}
+          hitSlop={moderateScale(20, 0.3)}
         />
-      )} 
+      )}
+      {[
+        item?.taxpayer,
+        item?.diligence_verification,
+        item?.refund_dispersement,
+        item?.payment_method,
+        item?.internal_audit,
+        item?.irs_status,
+        item?.refund_invoice,
+        item?.refferal,
+      ].includes(1) &&
+        item && (
+          <CustomText
+          onPress={()=>{
+            navigationService.navigate('EmployeeReport',{userId : item?.id})
+          }}
+          isBold
+            style={{
+              position: 'absolute',
+              bottom: moderateScale(3, 0.3),
+              right: 4,
+              fontSize: moderateScale(12, 0.3),
+              color : Color.themeColor
+
+            }}>
+            View Report
+          </CustomText>
+        )}
 
       <ImageView
         images={ImageArrayCustom}

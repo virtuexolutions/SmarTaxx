@@ -35,7 +35,6 @@ const Receptionist = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisble] = useState(false);
   const [image, setImage] = useState({});
-  // console.log("🚀 ~ file: Receptionist.js:32 ~ Receptionist ~ image", image)
   const [showModal, setShowModal] = useState(false);
   const [visible , setVisible] = useState(false);
   const [multiImages , setMultiImages] = useState([]) ;

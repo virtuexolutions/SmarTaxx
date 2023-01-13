@@ -285,7 +285,7 @@ const InnerScreen = props => {
             actc: ACTC,
             aotc: AOTC,
             irs_notes: irsNotes,
-            signature: signature,
+            signature: signatureImage,
           }
         : name == 'Refund Dispersement'
         ? {
@@ -341,8 +341,8 @@ const InnerScreen = props => {
     const formData = new FormData()
 
     for (let key in body) {
+      name == 'Due Diligence verification' && formData.append(key , body[key]);
       if (['', null, undefined].includes(body[key])) {
-        name == 'Due Diligence verification' && formData.append(key , body[key]);
         return Platform.OS == 'android'
           ? ToastAndroid.show('All fields are required', ToastAndroid.SHORT)
           : alert('All fields are required');
@@ -365,18 +365,19 @@ const InnerScreen = props => {
         ? urlRefund_invoice
         : urlRefferal;
 
-    console.log(
-      '🚀 ~ file: InnerScreen.js:339 ~ InnerScreenHandleSubmit ~ url_for_Api',
-      url_for_Api,
-      body,
-    );
+  //  return console.log(
+  //     '🚀 ~ file: InnerScreen.js:339 ~ InnerScreenHandleSubmit ~ url_for_Api',
+  //     url_for_Api,
+  //     // body,
+  //     formData
+  //   );
 
     setIsLoading(true);
     const response = await Post(url_for_Api, name == 'Due Diligence verification' ? formData : body, apiHeader(token));
     setIsLoading(false);
 
     if (response != undefined) {
-      navigationService.navigate('Options', {item: response?.data?.data});
+      navigationService.navigate('Options', {item: response?.data?.data , name : name});
       console.log(response?.data?.data);
     }
   };
