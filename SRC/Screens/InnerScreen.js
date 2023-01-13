@@ -35,6 +35,7 @@ const InnerScreen = props => {
   const id = props?.route?.params?._id;
   const ref = useRef();
   const [signature, setSignature] = useState(null);
+  console.log("🚀 ~ file: InnerScreen.js:38 ~ InnerScreen ~ signature", signature)
 
   //states for TaxPayer
   const [SSN, setSSN] = useState('');
@@ -285,7 +286,7 @@ const InnerScreen = props => {
             actc: ACTC,
             aotc: AOTC,
             irs_notes: irsNotes,
-            signature: signatureImage,
+            signature: signature,
           }
         : name == 'Refund Dispersement'
         ? {
@@ -341,7 +342,7 @@ const InnerScreen = props => {
     const formData = new FormData()
 
     for (let key in body) {
-      name == 'Due Diligence verification' && formData.append(key , body[key]);
+      // name == 'Due Diligence verification' && formData.append(key , body[key]);
       if (['', null, undefined].includes(body[key])) {
         return Platform.OS == 'android'
           ? ToastAndroid.show('All fields are required', ToastAndroid.SHORT)
@@ -373,12 +374,12 @@ const InnerScreen = props => {
   //   );
 
     setIsLoading(true);
-    const response = await Post(url_for_Api, name == 'Due Diligence verification' ? formData : body, apiHeader(token));
+    const response = await Post(url_for_Api,  body, apiHeader(token));
     setIsLoading(false);
 
     if (response != undefined) {
       navigationService.navigate('Options', {item: response?.data?.data , name : name});
-      console.log(response?.data?.data);
+      // console.log(response?.data?.data);
     }
   };
 
@@ -406,7 +407,6 @@ const InnerScreen = props => {
 
   // Called after ref.current.readSignature() reads a non-empty base64 string
   const handleOK = signature => {
-    console.log('here ==> in handle');
     setSignature(signature); // Callback from Component props
   };
 
@@ -419,7 +419,6 @@ const InnerScreen = props => {
 
   // Called after ref.current.clearSignature()
   const handleClear = () => {
-    console.log('here ==> in handle clear success!');
   };
 
   const handleSave = async () => {
@@ -435,7 +434,7 @@ const InnerScreen = props => {
       RNFetchBlob.fs.writeFile(filePath, image_data[1], 'base64')
       .then(() => {
         setSignatureImage(filePath);
-        console.log("Successfuly saved to"+ filePath)
+        // console.log("Successfuly saved to"+ filePath)
       })
       .catch((errorMessage) =>{
         console.log(errorMessage)
@@ -443,7 +442,7 @@ const InnerScreen = props => {
         
       if (Platform.OS ==='ios') {
       const dirs = RNFetchBlob.fs.dirs
-      console.log(dirs)
+      // console.log(dirs)
       var image_data = signature.split('data:image/png;base64,');
       const filePath = dirs.DocumentDir+"/"+'signature'+new Date().getMilliseconds()+'.png'
       RNFetchBlob.fs.writeFile(filePath, image_data[1], 'base64')
